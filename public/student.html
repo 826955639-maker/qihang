@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>起航附中 · 学生端</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div>
+        <h1 id="studentName">学生端</h1>
+        <div class="sub" id="studentGrade"></div>
+      </div>
+      <div class="flex">
+        <select id="studentSwitch" style="width:auto;padding:6px 8px;font-size:13px;background:rgba(255,255,255,.2);color:#fff;border:none"></select>
+        <button id="logout">退出</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div id="tab-checkin"></div>
+      <div id="tab-timetable" class="hidden"></div>
+      <div id="tab-bill" class="hidden"></div>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <button data-tab="checkin" class="active"><span class="ico">✍️</span>签到</button>
+    <button data-tab="timetable"><span class="ico">📅</span>课表</button>
+    <button data-tab="bill"><span class="ico">💰</span>账单</button>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/student.js"></script>
+</body>
+</html>

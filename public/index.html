@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>起航附中 · 登录</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="logo">🚀 起航附中</div>
+      <div class="tag">补课班签到 · 排课 · 财务管理</div>
+
+      <div class="seg" id="roleSeg">
+        <button class="active" data-role="student">学生 / 家长</button>
+        <button data-role="admin">管理员</button>
+      </div>
+
+      <!-- 学生登录 -->
+      <div id="studentForm">
+        <label>家长手机号</label>
+        <input id="phone" type="tel" inputmode="numeric" placeholder="请输入登记的家长手机号" />
+        <div class="mt"><button class="btn" id="studentLogin">登录</button></div>
+        <p class="small muted mt">演示手机号：13800000001 / 13800000002</p>
+      </div>
+
+      <!-- 管理员登录 -->
+      <div id="adminForm" class="hidden">
+        <label>管理员密码</label>
+        <input id="password" type="password" placeholder="请输入管理员密码" />
+        <div class="mt"><button class="btn" id="adminLogin">登录</button></div>
+        <p class="small muted mt">演示密码：admin123</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    if (Auth.token) { location.href = Auth.role === 'admin' ? '/admin.html' : '/student.html'; }
+
+    const seg = document.getElementById('roleSeg');
+    seg.addEventListener('click', (e) => {
+      const btn = e.target.closest('button'); if (!btn) return;
+      seg.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b === btn));
+      const admin = btn.dataset.role === 'admin';
+      document.getElementById('adminForm').classList.toggle('hidden', !admin);
+      document.getElementById('studentForm').classList.toggle('hidden', admin);
+    });
+
+    document.getElementById('studentLogin').onclick = async () => {
+      const phone = document.getElementById('phone').value.trim();
+      if (!phone) return toast('请输入手机号');
+      try {
+        const r = await api('/api/auth/student-login', { method: 'POST', body: { phone } });
+        Auth.set(r.token, 'student');
+        localStorage.setItem('qh_students', JSON.stringify(r.students));
+        location.href = '/student.html';
+      } catch (e) { toast(e.message); }
+    };
+    document.getElementById('adminLogin').onclick = async () => {
+      const password = document.getElementById('password').value;
+      if (!password) return toast('请输入密码');
+      try {
+        const r = await api('/api/auth/admin-login', { method: 'POST', body: { password } });
+        Auth.set(r.token, 'admin');
+        location.href = '/admin.html';
+      } catch (e) { toast(e.message); }
+    };
+    document.getElementById('password').addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('adminLogin').click(); });
+    document.getElementById('phone').addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('studentLogin').click(); });
+  </script>
+</body>
+</html>
