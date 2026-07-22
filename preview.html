@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>起航附中 · 系统预览（离线单文件 Demo）</title>
+<style>
+:root{--brand:#2563eb;--brand-dark:#1d4ed8;--bg:#f4f6fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--border:#e5e7eb;--ok:#16a34a;--warn:#dc2626;--leave:#d97706;--radius:12px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--brand);text-decoration:none}h1,h2,h3{margin:0 0 .5em}
+.app{max-width:1100px;margin:0 auto;padding-bottom:72px}
+.topbar{position:sticky;top:0;z-index:20;background:var(--brand);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.topbar h1{font-size:17px;margin:0}.topbar .sub{font-size:12px;opacity:.85}
+.topbar button{background:rgba(255,255,255,.2);color:#fff;border:none;padding:6px 12px;border-radius:8px}
+.content{padding:16px}
+.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;background:var(--card);border-top:1px solid var(--border);max-width:1100px;margin:0 auto}
+.tabbar button{flex:1;border:none;background:none;padding:10px 4px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabbar button.active{color:var(--brand);font-weight:600}.tabbar .ico{font-size:20px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.card h2{font-size:16px}.card .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border)}.card .row:last-child{border-bottom:none}
+.muted{color:var(--muted)}.small{font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.stat .num{font-size:26px;font-weight:700;color:var(--brand)}.stat .lbl{font-size:13px;color:var(--muted)}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px;background:#fff;color:var(--text)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--brand);color:#fff;border:none;border-radius:10px;padding:12px 16px;font-size:15px;font-weight:600;cursor:pointer;width:100%}
+.btn:active{background:var(--brand-dark)}.btn.secondary{background:#eef2ff;color:var(--brand)}.btn.ghost{background:transparent;color:var(--brand);border:1px solid var(--brand)}.btn.danger{background:var(--warn)}
+.btn.sm{width:auto;padding:7px 12px;font-size:13px;border-radius:8px}
+.btn-row{display:flex;gap:8px}.btn-row .btn{width:auto;flex:1}
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600}
+.badge.ok{background:#dcfce7;color:var(--ok)}.badge.warn{background:#fee2e2;color:var(--warn)}.badge.leave{background:#fef3c7;color:var(--leave)}.badge.gray{background:#f3f4f6;color:var(--muted)}.badge.blue{background:#dbeafe;color:var(--brand)}
+.item{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:10px}
+.item .head{display:flex;justify-content:space-between;align-items:center}.item .title{font-weight:600}.item .meta{font-size:13px;color:var(--muted);margin-top:4px}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:14px;white-space:nowrap}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600;background:#fafbff}tr:hover td{background:#fafbff}
+.seg{display:flex;background:#eef2ff;border-radius:10px;padding:3px;margin-bottom:14px}
+.seg button{flex:1;border:none;background:none;padding:8px;border-radius:8px;font-size:14px;color:var(--brand)}
+.seg button.active{background:#fff;font-weight:600;box-shadow:var(--shadow)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:#fff;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:20px}
+.modal h2{display:flex;justify-content:space-between;align-items:center}.modal .close{background:none;border:none;font-size:22px;color:var(--muted);width:auto;padding:0}
+@media(min-width:640px){.modal-bg{align-items:center}.modal{border-radius:16px}}
+.sign-pad{border:2px dashed var(--brand);border-radius:12px;background:#fff;touch-action:none;width:100%;height:220px}
+.sign-hint{text-align:center;color:var(--muted);font-size:13px;margin:6px 0}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,#2563eb,#1e40af)}
+.login-card{background:#fff;border-radius:18px;padding:28px 24px;width:100%;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.login-card .logo{text-align:center;font-size:28px;font-weight:800;color:var(--brand);margin-bottom:4px}
+.login-card .tag{text-align:center;color:var(--muted);margin-bottom:20px;font-size:14px}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(31,41,55,.95);color:#fff;padding:12px 20px;border-radius:10px;z-index:100;font-size:14px;max-width:90%;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.hidden{display:none !important}.empty{text-align:center;color:var(--muted);padding:40px 20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:480px){.grid2{grid-template-columns:1fr}}
+.flex{display:flex;gap:8px;align-items:center}.flex-between{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mt{margin-top:12px}.wrap-actions{display:flex;flex-wrap:wrap;gap:6px}
+.adminnav{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:52px;z-index:15}
+.adminnav button{white-space:nowrap;border:none;background:#eef2ff;color:var(--brand);padding:8px 14px;border-radius:20px;font-size:14px}
+.adminnav button.active{background:var(--brand);color:#fff;font-weight:600}
+.demo-banner{background:#fffbeb;border-bottom:1px solid #fde68a;color:#92400e;font-size:12px;text-align:center;padding:6px 12px}
+</style>
+</head>
+<body>
+
+<!-- ============ 登录 ============ -->
+<div id="screen-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="logo">🚀 起航附中</div>
+      <div class="tag">补课班签到 · 排课 · 财务管理（离线预览 Demo）</div>
+      <div class="seg" id="roleSeg">
+        <button class="active" data-role="student">学生 / 家长</button>
+        <button data-role="admin">管理员</button>
+      </div>
+      <div id="studentForm">
+        <label>家长手机号</label>
+        <input id="phone" type="tel" inputmode="numeric" value="13800000002" placeholder="请输入登记的家长手机号" />
+        <div class="mt"><button class="btn" id="studentLogin">登录</button></div>
+        <p class="small muted mt">演示手机号：13800000001 / 13800000002</p>
+      </div>
+      <div id="adminForm" class="hidden">
+        <label>管理员密码</label>
+        <input id="password" type="password" value="admin123" placeholder="请输入管理员密码" />
+        <div class="mt"><button class="btn" id="adminLogin">登录</button></div>
+        <p class="small muted mt">演示密码：admin123</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 学生端 ============ -->
+<div id="screen-student" class="hidden">
+  <div class="app">
+    <div class="demo-banner">📱 离线预览：数据仅存于本页，刷新后重置</div>
+    <div class="topbar">
+      <div><h1 id="studentName">学生端</h1><div class="sub" id="studentGrade"></div></div>
+      <div class="flex">
+        <select id="studentSwitch" style="width:auto;padding:6px 8px;font-size:13px;background:rgba(255,255,255,.2);color:#fff;border:none"></select>
+        <button id="btnStudentLogout">退出</button>
+      </div>
+    </div>
+    <div class="content">
+      <div id="tab-checkin"></div>
+      <div id="tab-timetable" class="hidden"></div>
+      <div id="tab-bill" class="hidden"></div>
+    </div>
+  </div>
+  <div class="tabbar" id="studentTabbar">
+    <button data-tab="checkin" class="active"><span class="ico">✍️</span>签到</button>
+    <button data-tab="timetable"><span class="ico">📅</span>课表</button>
+    <button data-tab="bill"><span class="ico">💰</span>账单</button>
+  </div>
+</div>
+
+<!-- ============ 管理端 ============ -->
+<div id="screen-admin" class="hidden">
+  <div class="app">
+    <div class="demo-banner">🖥️ 离线预览：数据仅存于本页，刷新后重置</div>
+    <div class="topbar">
+      <div><h1>🚀 起航附中 · 管理端</h1><div class="sub" id="todayLbl"></div></div>
+      <button id="btnAdminLogout">退出</button>
+    </div>
+    <div class="adminnav" id="adminNav">
+      <button data-tab="dashboard" class="active">📊 看板</button>
+      <button data-tab="courses">📅 排课</button>
+      <button data-tab="students">👨‍🎓 学生</button>
+      <button data-tab="teachers">👩‍🏫 教师</button>
+      <button data-tab="finance">💰 财务</button>
+      <button data-tab="logs">📝 日志</button>
+      <button data-tab="settings">⚙️ 设置</button>
+    </div>
+    <div class="content" id="adminView"></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* =====================================================================
+   离线内存后端：镜像真实 SQLite 表结构与业务逻辑（签到扣费/排课/财务）
+   ===================================================================== */
+const nowStr = () => { const d=new Date(),p=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; };
+const TODAY = new Date().toISOString().slice(0,10);
+const seq = {}; const nextId = t => (seq[t]=(seq[t]||0)+1);
+
+const DB = { students:[],teachers:[],classrooms:[],courses:[],sessions:[],enrollments:[],accounts:[],
+  transactions:[],attendance:[],logs:[],partners:[],costs:[],settings:{absent_charge:'1',leave_lead_hours:'2',admin_password:'admin123'} };
+
+/* ---- 排课日期计算（与后端 schedule.js 一致）---- */
+function parseD(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
+function fmtD(dt){const p=n=>String(n).padStart(2,'0');return `${dt.getFullYear()}-${p(dt.getMonth()+1)}-${p(dt.getDate())}`;}
+function isoWd(dt){const w=dt.getDay();return w===0?7:w;}
+function computeDates(c){const out=[];
+  if(c.mode==='camp'){if(!c.start_date||!c.end_date)return out;const rest=new Set(c.rest_days||[]);
+    const lim=c.total_sessions||Infinity;for(let dt=parseD(c.start_date);dt<=parseD(c.end_date)&&out.length<lim;dt.setDate(dt.getDate()+1)){
+      const ds=fmtD(dt);if(rest.has(ds))continue;out.push(ds);}}
+  else if(c.mode==='weekly'){if(!c.start_date||!c.end_date)return out;const wd=new Set(c.weekdays||[]);
+    for(let dt=parseD(c.start_date);dt<=parseD(c.end_date);dt.setDate(dt.getDate()+1))if(wd.has(isoWd(dt)))out.push(fmtD(dt));}
+  return out;}
+function overlaps(s1,e1,s2,e2){return s1<e2&&s2<e1;}
+function regenerate(courseId){const c=DB.courses.find(x=>x.id===courseId);const want=computeDates(c);const wantSet=new Set(want);
+  const exist=DB.sessions.filter(s=>s.course_id===courseId);const byDate=new Map(exist.map(s=>[s.date,s]));
+  for(const s of exist){if(!wantSet.has(s.date)&&!DB.attendance.some(a=>a.session_id===s.id))DB.sessions=DB.sessions.filter(x=>x!==s);}
+  want.forEach((ds,i)=>{const ex=byDate.get(ds);if(ex){ex.start_time=c.start_time;ex.end_time=c.end_time;ex.seq=i+1;}
+    else DB.sessions.push({id:nextId('session'),course_id:courseId,date:ds,start_time:c.start_time,end_time:c.end_time,seq:i+1,status:'scheduled'});});
+  return DB.sessions.filter(s=>s.course_id===courseId).length;}
+function detectConflicts(c,excludeId){const dates=computeDates(c);if(!dates.length||!c.classroom_id)return[];const out=[];const cid=Number(c.classroom_id);
+  for(const ds of dates){for(const s of DB.sessions.filter(x=>x.date===ds&&x.status==='scheduled')){const co=DB.courses.find(k=>k.id===s.course_id);
+    if(!co||co.classroom_id!==cid||co.id===excludeId)continue;if(overlaps(c.start_time,c.end_time,s.start_time,s.end_time))out.push({date:ds,start_time:s.start_time,end_time:s.end_time,subject:co.subject,grade:co.grade,course_id:co.id});}}
+  return out;}
+function audit(actor,action,entity,eid,detail){DB.logs.unshift({id:nextId('log'),actor,action,entity,entity_id:String(eid??''),detail:detail?JSON.stringify(detail):null,created_at:nowStr()});}
+function ensureAccount(sid,cid){let a=DB.accounts.find(x=>x.student_id===sid&&x.course_id===cid);
+  if(!a){a={id:nextId('acc'),student_id:sid,course_id:cid,total_recharge:0,total_consumed:0,balance:0,warn_threshold:2};DB.accounts.push(a);}return a;}
+function unitPriceFor(sid,cid){const e=DB.enrollments.find(x=>x.student_id===sid&&x.course_id===cid);
+  if(e&&e.unit_price!=null)return e.unit_price;const c=DB.courses.find(x=>x.id===cid);return c?c.unit_price:0;}
+
+/* ================= 种子数据（按暑期海报）================= */
+(function seed(){
+  const YEAR=2026,D=(m,d)=>`${YEAR}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,PRICE=100,HOURLY=300;
+  ['A 教室','B 教室','C 教室','D 教室'].forEach(n=>DB.classrooms.push({id:nextId('room'),name:n}));
+  const T=(name,subjects)=>{const id=nextId('teacher');DB.teachers.push({id,name,phone:'',subjects,hourly_fee:HOURLY});return id;};
+  const tZ=T('中考命题专家 Z 老师','数学,语文'),tExpert=T('中考命题专家','政治'),tSD=T('SD 附中名师','历史'),
+    tZhang=T('SD 附中张老师','物理'),tHua=T('中考命题专家/汾 D 名师','化学'),tFenD=T('SD 附中汾 D 名师','英语,化学,物理,历史');
+  function camp(grade,subject,teacher,sd,ed,st,et,sessions,rest,room){const id=nextId('course');
+    DB.courses.push({id,grade,subject,teacher_id:teacher,classroom_id:room,unit_price:PRICE,mode:'camp',start_time:st,end_time:et,
+      start_date:sd,end_date:ed,rest_days:rest||[],total_sessions:sessions,weekdays:[],status:'active'});regenerate(id);return id;}
+  const R=DB.classrooms.map(r=>r.id);
+  // 新初一
+  camp('初一','数学',tZ,D(7,26),D(8,11),'09:10','10:40',15,[D(8,2)],R[0]);
+  camp('初一','语文',tZ,D(7,26),D(8,11),'10:50','12:10',15,[D(8,2)],R[0]);
+  camp('初一','政治',tExpert,D(7,26),D(7,31),'16:10','17:40',5,[],R[0]);
+  camp('初一','历史',tSD,D(7,26),D(7,31),'17:50','19:20',5,[],R[0]);
+  camp('初一','数学(分班考)',tZ,D(8,13),D(8,16),'14:30','16:00',4,[],R[0]);
+  camp('初一','语文(分班考)',tZ,D(8,13),D(8,16),'16:10','17:40',4,[],R[0]);
+  camp('初一','英语(分班考)',tFenD,D(8,13),D(8,16),'17:50','19:20',4,[],R[0]);
+  // 新初二
+  camp('初二','语文',tZ,D(7,26),D(8,10),'07:30','09:00',15,[D(8,2)],R[1]);
+  camp('初二','物理',tZhang,D(7,26),D(8,10),'09:10','10:40',15,[D(8,2)],R[1]);
+  camp('初二','数学',tZ,D(7,26),D(8,10),'10:50','12:20',15,[D(8,2)],R[1]);
+  camp('初二','化学',tHua,D(7,26),D(8,10),'14:30','16:00',15,[D(8,2)],R[1]);
+  camp('初二','英语',tFenD,D(7,26),D(8,10),'16:10','17:40',15,[D(8,2)],R[1]);
+  // 新初三
+  camp('初三','数学',tZ,D(7,26),D(8,11),'07:30','09:00',15,[D(8,3)],R[2]);
+  camp('初三','语文',tZ,D(7,26),D(8,11),'09:10','10:40',15,[D(8,3)],R[2]);
+  camp('初三','英语',tFenD,D(7,26),D(8,11),'10:50','12:20',15,[D(8,3)],R[2]);
+  camp('初三','化学',tFenD,D(7,26),D(8,11),'14:30','16:00',15,[D(8,3)],R[2]);
+  camp('初三','物理',tFenD,D(7,26),D(8,11),'16:10','17:40',15,[D(8,3)],R[2]);
+  camp('初三','政治',tExpert,D(7,26),D(8,11),'17:50','19:20',8,[D(8,3)],R[2]);
+  camp('初三','历史',tFenD,D(7,26),D(8,11),'19:30','21:00',8,[D(8,3)],R[2]);
+  // 高一：常规周期模式演示课（覆盖到"今天"，随时可测签到）
+  const g4=nextId('course');DB.courses.push({id:g4,grade:'高一',subject:'数学',teacher_id:tZ,classroom_id:R[3],unit_price:PRICE,
+    mode:'weekly',start_time:'19:00',end_time:'20:30',start_date:'2025-01-01',end_date:'2027-12-31',rest_days:[],total_sessions:null,
+    weekdays:[1,2,3,4,5,6,7],status:'active',note:'常规周期模式演示课'});regenerate(g4);
+
+  function addStu(name,grade,phone){const id=nextId('student');DB.students.push({id,name,grade,guardian_phone:phone,enroll_date:D(7,20),note:''});return id;}
+  function enroll(sid,cid,recharge){DB.enrollments.push({id:nextId('enr'),student_id:sid,course_id:cid,billing_type:'balance',unit_price:null,status:'active'});
+    const a=ensureAccount(sid,cid);if(recharge){DB.transactions.push({id:nextId('txn'),student_id:sid,course_id:cid,amount:recharge,type:'recharge',method:'prestore',operator:'admin',note:'演示充值',created_at:nowStr()});
+      a.total_recharge+=recharge;a.balance+=recharge;}}
+  const byGrade=g=>DB.courses.filter(c=>c.grade===g).map(c=>c.id);
+  const s1=addStu('张小明','初一','13800000001'),s2=addStu('李小红','初三','13800000001'),s3=addStu('王小刚','初二','13800000002'),s4=addStu('赵小丽','高一','13800000002');
+  byGrade('初一').forEach(c=>enroll(s1,c,1500));byGrade('初三').forEach(c=>enroll(s2,c,1500));
+  byGrade('初二').forEach(c=>enroll(s3,c,1500));byGrade('高一').forEach(c=>enroll(s4,c,800));
+  DB.partners.push({id:nextId('p'),name:'负责人甲',ratio:0.6},{id:nextId('p'),name:'负责人乙',ratio:0.4});
+})();
+
+/* ================= 内存 API 路由（镜像后端接口）================= */
+function err(msg,status,data){const e=new Error(msg);e.status=status;e.data=data;return e;}
+function api(path,opts={}){const method=opts.method||'GET',body=opts.body||{};
+  return new Promise((res,rej)=>{try{res(route(path,method,body));}catch(e){rej(e);}});}
+
+function route(path,method,body){
+  const[p,qs]=path.split('?');const q={};if(qs)qs.split('&').forEach(kv=>{const[k,v]=kv.split('=');q[k]=decodeURIComponent(v||'');});
+  const seg=p.split('/').filter(Boolean); // e.g. ['api','admin','courses']
+  const m=(re)=>p.match(re);
+
+  /* ---- auth ---- */
+  if(p==='/api/auth/admin-login'){if(body.password!==DB.settings.admin_password)throw err('密码错误',401);return{token:'demo',role:'admin'};}
+  if(p==='/api/auth/student-login'){const st=DB.students.filter(s=>s.guardian_phone===body.phone).map(s=>({id:s.id,name:s.name,grade:s.grade}));
+    if(!st.length)throw err('未找到该手机号下的学生',404);return{token:'demo',students:st,role:'student'};}
+
+  /* ---- 学生端 ---- */
+  if(p==='/api/student/timetable'){const sid=Number(q.studentId);const stu=DB.students.find(s=>s.id===sid);const view=q.view||'today';
+    let from=q.date||TODAY,to=from;if(view==='today'){from=to=TODAY;}
+    if(view==='week'){const d=parseD(TODAY);const wd=isoWd(d);const mon=new Date(d);mon.setDate(d.getDate()-(wd-1));const sun=new Date(mon);sun.setDate(mon.getDate()+6);from=fmtD(mon);to=fmtD(sun);}
+    if(view==='date'){from=to=q.date||TODAY;}
+    const sessions=DB.sessions.filter(s=>{const c=DB.courses.find(x=>x.id===s.course_id);return c&&c.grade===stu.grade&&s.date>=from&&s.date<=to;})
+      .map(s=>{const c=DB.courses.find(x=>x.id===s.course_id);const t=DB.teachers.find(x=>x.id===c.teacher_id);const r=DB.classrooms.find(x=>x.id===c.classroom_id);
+        const ar=DB.attendance.find(a=>a.student_id===sid&&a.session_id===s.id);
+        return{session_id:s.id,date:s.date,start_time:s.start_time,end_time:s.end_time,seq:s.seq,status:s.status,course_id:c.id,subject:c.subject,grade:c.grade,
+          teacher:t?t.name:null,classroom:r?r.name:null,my_status:ar?ar.status:null,enrolled:DB.enrollments.some(e=>e.student_id===sid&&e.course_id===c.id)?1:null};})
+      .sort((a,b)=>a.date.localeCompare(b.date)||a.start_time.localeCompare(b.start_time));
+    return{student:stu,view,from,to,sessions};}
+
+  if(p==='/api/student/today'){const sid=Number(q.studentId);const out=[];
+    DB.enrollments.filter(e=>e.student_id===sid&&e.status==='active').forEach(e=>{const c=DB.courses.find(x=>x.id===e.course_id);
+      DB.sessions.filter(s=>s.course_id===c.id&&s.date===TODAY).forEach(s=>{const t=DB.teachers.find(x=>x.id===c.teacher_id);const r=DB.classrooms.find(x=>x.id===c.classroom_id);
+        const ar=DB.attendance.find(a=>a.student_id===sid&&a.session_id===s.id);const acc=DB.accounts.find(a=>a.student_id===sid&&a.course_id===c.id);
+        out.push({session_id:s.id,date:s.date,start_time:s.start_time,end_time:s.end_time,course_id:c.id,subject:c.subject,teacher:t?t.name:null,classroom:r?r.name:null,
+          my_status:ar?ar.status:null,signed_at:ar?ar.signed_at:null,price:unitPriceFor(sid,c.id),balance:acc?acc.balance:0});});});
+    out.sort((a,b)=>a.start_time.localeCompare(b.start_time));return{date:TODAY,sessions:out};}
+
+  if(p==='/api/student/checkin'&&method==='POST')return doCheckin(Number(body.studentId),Number(body.sessionId),body.signature,'student');
+  if(p==='/api/student/leave'&&method==='POST'){const sid=Number(body.studentId);const s=DB.sessions.find(x=>x.id===Number(body.sessionId));if(!s)throw err('课次不存在',400);
+    const ex=DB.attendance.find(a=>a.student_id===sid&&a.session_id===s.id);if(ex&&ex.status==='present')throw err('已签到，不能请假',400);
+    const lead=Number(DB.settings.leave_lead_hours);const start=new Date(`${s.date}T${s.start_time}:00`);
+    if(Date.now()+lead*3600e3>start.getTime())throw err(`请假需在开课前 ${lead} 小时提交`,400);
+    if(ex){ex.status='leave';ex.charged=0;ex.signature=null;}else DB.attendance.push({id:nextId('att'),student_id:sid,session_id:s.id,status:'leave',operator:'student',charged:0});
+    audit('student:'+sid,'leave','session',s.id,{});return{ok:true};}
+
+  if(p==='/api/student/bill'){const sid=Number(q.studentId);const courses=DB.enrollments.filter(e=>e.student_id===sid).map(e=>{const c=DB.courses.find(x=>x.id===e.course_id);
+    const acc=DB.accounts.find(a=>a.student_id===sid&&a.course_id===c.id)||{total_recharge:0,total_consumed:0,balance:0,warn_threshold:2};
+    const pc=DB.attendance.filter(a=>a.student_id===sid&&a.status==='present'&&DB.sessions.find(s=>s.id===a.session_id&&s.course_id===c.id)).length;
+    const lc=DB.attendance.filter(a=>a.student_id===sid&&a.status==='leave'&&DB.sessions.find(s=>s.id===a.session_id&&s.course_id===c.id)).length;
+    return{course_id:c.id,subject:c.subject,price:unitPriceFor(sid,c.id),total_recharge:acc.total_recharge,total_consumed:acc.total_consumed,balance:acc.balance,warn_threshold:acc.warn_threshold,present_count:pc,leave_count:lc};});
+    const history=DB.attendance.filter(a=>a.student_id===sid).map(a=>{const s=DB.sessions.find(x=>x.id===a.session_id);const c=DB.courses.find(x=>x.id===s.course_id);
+      return{id:a.id,status:a.status,signed_at:a.signed_at,signature:a.signature,charged:a.charged,date:s.date,start_time:s.start_time,subject:c.subject};})
+      .sort((x,y)=>y.date.localeCompare(x.date)||y.start_time.localeCompare(x.start_time));
+    return{courses,history};}
+
+  /* ---- 管理端 ---- */
+  if(p==='/api/admin/dashboard')return dashboard();
+  if(p==='/api/admin/teachers'&&method==='GET')return DB.teachers.slice();
+  if(p==='/api/admin/teachers'&&method==='POST'){if(body.id){Object.assign(DB.teachers.find(t=>t.id===body.id),{name:body.name,phone:body.phone,subjects:body.subjects,hourly_fee:body.hourly_fee||0});audit('admin','update','teacher',body.id,{});return{id:body.id};}
+    const id=nextId('teacher');DB.teachers.push({id,name:body.name,phone:body.phone||'',subjects:body.subjects||'',hourly_fee:body.hourly_fee||0});audit('admin','create','teacher',id,{});return{id};}
+  if(p==='/api/admin/classrooms'&&method==='GET')return DB.classrooms.slice();
+  if(p==='/api/admin/classrooms'&&method==='POST'){const id=nextId('room');DB.classrooms.push({id,name:body.name});audit('admin','create','classroom',id,{});return{id};}
+  if(m(/^\/api\/admin\/classrooms\/(\d+)$/)&&method==='DELETE'){const id=Number(m(/\/(\d+)$/)[1]);DB.classrooms=DB.classrooms.filter(r=>r.id!==id);audit('admin','delete','classroom',id);return{ok:true};}
+
+  if(p==='/api/admin/students'&&method==='GET')return(q.grade?DB.students.filter(s=>s.grade===q.grade):DB.students).slice();
+  if(p==='/api/admin/students'&&method==='POST'){if(body.id){Object.assign(DB.students.find(s=>s.id===body.id),{name:body.name,grade:body.grade,guardian_phone:body.guardian_phone,enroll_date:body.enroll_date,note:body.note});audit('admin','update','student',body.id,{});return{id:body.id};}
+    const id=nextId('student');DB.students.push({id,name:body.name,grade:body.grade,guardian_phone:body.guardian_phone||'',enroll_date:body.enroll_date||TODAY,note:body.note||''});audit('admin','create','student',id,{});return{id};}
+
+  if(p==='/api/admin/courses'&&method==='GET')return DB.courses.map(c=>({...c,rest_days:JSON.stringify(c.rest_days),weekdays:JSON.stringify(c.weekdays),
+    teacher_name:(DB.teachers.find(t=>t.id===c.teacher_id)||{}).name,classroom_name:(DB.classrooms.find(r=>r.id===c.classroom_id)||{}).name,
+    session_count:DB.sessions.filter(s=>s.course_id===c.id).length,enroll_count:DB.enrollments.filter(e=>e.course_id===c.id).length}))
+    .sort((a,b)=>a.grade.localeCompare(b.grade)||a.start_time.localeCompare(b.start_time));
+  if(p==='/api/admin/courses/check-conflict'&&method==='POST')return{conflicts:detectConflicts(body,body.id||null)};
+  if(p==='/api/admin/courses'&&method==='POST')return saveCourse(body);
+  if(m(/^\/api\/admin\/courses\/(\d+)$/)&&method==='DELETE'){const id=Number(m(/\/(\d+)$/)[1]);DB.courses=DB.courses.filter(c=>c.id!==id);DB.sessions=DB.sessions.filter(s=>s.course_id!==id);audit('admin','delete','course',id);return{ok:true};}
+  if(m(/^\/api\/admin\/courses\/(\d+)\/sessions$/)){const id=Number(m(/courses\/(\d+)/)[1]);return DB.sessions.filter(s=>s.course_id===id).map(s=>({...s,
+    present:DB.attendance.filter(a=>a.session_id===s.id&&a.status==='present').length,leave_cnt:DB.attendance.filter(a=>a.session_id===s.id&&a.status==='leave').length})).sort((a,b)=>a.date.localeCompare(b.date));}
+  if(m(/^\/api\/admin\/courses\/(\d+)\/enrollments$/)){const id=Number(m(/courses\/(\d+)/)[1]);return DB.enrollments.filter(e=>e.course_id===id).map(e=>{const s=DB.students.find(x=>x.id===e.student_id);const acc=DB.accounts.find(a=>a.student_id===e.student_id&&a.course_id===id)||{};
+    return{...e,name:s.name,guardian_phone:s.guardian_phone,balance:acc.balance,total_recharge:acc.total_recharge,total_consumed:acc.total_consumed};});}
+  if(p==='/api/admin/enrollments'&&method==='POST'){if(DB.enrollments.some(e=>e.student_id===body.student_id&&e.course_id===body.course_id))throw err('该生已报名此课程',400);
+    DB.enrollments.push({id:nextId('enr'),student_id:body.student_id,course_id:body.course_id,unit_price:body.unit_price??null,billing_type:body.billing_type||'balance',status:'active'});ensureAccount(body.student_id,body.course_id);audit('admin','enroll','enrollment',`${body.student_id}-${body.course_id}`,{});return{ok:true};}
+  if(m(/^\/api\/admin\/enrollments\/(\d+)$/)&&method==='DELETE'){const id=Number(m(/\/(\d+)$/)[1]);DB.enrollments=DB.enrollments.filter(e=>e.id!==id);return{ok:true};}
+
+  if(m(/^\/api\/admin\/sessions\/(\d+)\/cancel$/)&&method==='POST'){const id=Number(m(/sessions\/(\d+)/)[1]);const s=DB.sessions.find(x=>x.id===id);s.status=body.cancel?'canceled':'scheduled';audit('admin','session_status','session',id,{status:s.status});return{ok:true};}
+  if(m(/^\/api\/admin\/sessions\/(\d+)\/roster$/)){const id=Number(m(/sessions\/(\d+)/)[1]);const s=DB.sessions.find(x=>x.id===id);const c=DB.courses.find(x=>x.id===s.course_id);
+    const roster=DB.enrollments.filter(e=>e.course_id===c.id).map(e=>{const st=DB.students.find(x=>x.id===e.student_id);const ar=DB.attendance.find(a=>a.student_id===e.student_id&&a.session_id===id);
+      return{student_id:st.id,name:st.name,status:ar?ar.status:null,signed_at:ar?ar.signed_at:null,charged:ar?ar.charged:null};});
+    return{session:{...s,subject:c.subject,grade:c.grade,course_id:c.id},roster};}
+  if(p==='/api/admin/attendance'&&method==='POST')return setAttendance(body);
+
+  if(p==='/api/admin/finance/transaction'&&method==='POST')return doTxn(body);
+  if(p==='/api/admin/finance/transactions'){let rows=DB.transactions.slice();if(q.from)rows=rows.filter(t=>t.created_at.slice(0,10)>=q.from);if(q.to)rows=rows.filter(t=>t.created_at.slice(0,10)<=q.to);
+    return rows.map(t=>({...t,student_name:(DB.students.find(s=>s.id===t.student_id)||{}).name,subject:(DB.courses.find(c=>c.id===t.course_id)||{}).subject})).sort((a,b)=>b.created_at.localeCompare(a.created_at));}
+  if(m(/^\/api\/admin\/finance\/reconcile\/(\d+)$/))return reconcile(Number(m(/reconcile\/(\d+)/)[1]));
+  if(p==='/api/admin/finance/teacher-fees')return teacherFees(q.period||TODAY.slice(0,7));
+  if(p==='/api/admin/finance/teacher-fees/pay'&&method==='POST'){audit('admin','pay_teacher','teacher',body.teacher_id,{period:body.period,amount:body.amount});DB._paid=DB._paid||{};DB._paid[body.teacher_id+'|'+body.period]=true;return{ok:true};}
+  if(p==='/api/admin/finance/costs'&&method==='GET')return DB.costs.slice().sort((a,b)=>b.incurred_at.localeCompare(a.incurred_at));
+  if(p==='/api/admin/finance/costs'&&method==='POST'){const id=nextId('cost');DB.costs.push({id,name:body.name,amount:Number(body.amount),incurred_at:nowStr(),note:body.note||''});audit('admin','add_cost','cost',id,{});return{id};}
+  if(p==='/api/admin/partners'&&method==='GET')return DB.partners.slice();
+  if(p==='/api/admin/partners'&&method==='POST'){if(body.id)Object.assign(DB.partners.find(x=>x.id===body.id),{name:body.name,ratio:body.ratio});else DB.partners.push({id:nextId('p'),name:body.name,ratio:body.ratio||0});return{ok:true};}
+  if(m(/^\/api\/admin\/partners\/(\d+)$/)&&method==='DELETE'){const id=Number(m(/\/(\d+)$/)[1]);DB.partners=DB.partners.filter(x=>x.id!==id);return{ok:true};}
+  if(p==='/api/admin/finance/summary')return summary(q.from||TODAY.slice(0,7)+'-01',q.to||TODAY);
+
+  if(p==='/api/admin/logs')return DB.logs.slice(0,300);
+  if(p==='/api/admin/settings'&&method==='GET'){const o={...DB.settings};delete o.admin_password;return o;}
+  if(p==='/api/admin/settings'&&method==='POST'){for(const[k,v]of Object.entries(body)){if(k==='admin_password'&&!v)continue;DB.settings[k]=String(v);}audit('admin','update_settings','settings','',{});return{ok:true};}
+
+  throw err('接口不存在: '+method+' '+p,404);
+}
+
+/* ---- 业务逻辑 ---- */
+function doCheckin(sid,sessionId,signature,operator){const s=DB.sessions.find(x=>x.id===sessionId);if(!s)throw err('课次不存在',400);
+  if(s.status==='canceled')throw err('该次课已停课',400);
+  const e=DB.enrollments.find(x=>x.student_id===sid&&x.course_id===s.course_id&&x.status==='active');if(!e)throw err('未报名该课程或已停课',400);
+  const ex=DB.attendance.find(a=>a.student_id===sid&&a.session_id===sessionId);
+  if(ex&&ex.status==='present')throw err('已签到，请勿重复',400);if(ex&&ex.status==='leave')throw err('已请假，不能再签到',400);
+  const charge=unitPriceFor(sid,s.course_id);const acc=ensureAccount(sid,s.course_id);
+  acc.balance-=charge;acc.total_consumed+=charge;
+  if(ex){Object.assign(ex,{status:'present',signed_at:nowStr(),signature,charged:charge,operator});}
+  else DB.attendance.push({id:nextId('att'),student_id:sid,session_id:sessionId,status:'present',signed_at:nowStr(),signature,charged:charge,operator});
+  audit(operator==='admin'?'admin':'student:'+sid,'checkin','session',sessionId,{studentId:sid,charge});return{ok:true,charged:charge,balance:acc.balance};}
+
+function setAttendance(body){const s=DB.sessions.find(x=>x.id===body.session_id);if(!s)throw err('课次不存在',400);
+  const ex=DB.attendance.find(a=>a.student_id===body.student_id&&a.session_id===body.session_id);
+  if(ex&&ex.charged){const acc=ensureAccount(body.student_id,s.course_id);acc.balance+=ex.charged;acc.total_consumed-=ex.charged;}
+  let charge=0;if(body.status==='present')charge=unitPriceFor(body.student_id,s.course_id);
+  if(body.status==='absent'&&DB.settings.absent_charge==='1')charge=unitPriceFor(body.student_id,s.course_id);
+  if(charge){const acc=ensureAccount(body.student_id,s.course_id);acc.balance-=charge;acc.total_consumed+=charge;}
+  if(ex){ex.status=body.status;ex.charged=charge;ex.operator='admin';if(body.status!=='present')ex.signature=null;}
+  else DB.attendance.push({id:nextId('att'),student_id:body.student_id,session_id:body.session_id,status:body.status,charged:charge,operator:'admin',signed_at:nowStr()});
+  audit('admin','set_attendance','session',body.session_id,{student_id:body.student_id,status:body.status,charge});return{ok:true};}
+
+function saveCourse(b){if(!b.grade||!b.subject||!b.mode||!b.start_time||!b.end_time)throw err('缺少必填字段',400);
+  if(!b.classroom_id)throw err('请分配教室',400);const conflicts=detectConflicts(b,b.id||null);
+  if(conflicts.length&&!b.force)throw err('教室时间冲突',409,{conflicts});
+  let id=b.id;const data={grade:b.grade,subject:b.subject,teacher_id:b.teacher_id?Number(b.teacher_id):null,classroom_id:Number(b.classroom_id),
+    unit_price:b.unit_price||0,mode:b.mode,start_time:b.start_time,end_time:b.end_time,start_date:b.start_date||null,end_date:b.end_date||null,
+    rest_days:b.rest_days||[],total_sessions:b.total_sessions||null,weekdays:b.weekdays||[],status:'active'};
+  if(id){Object.assign(DB.courses.find(c=>c.id===id),data);audit('admin','update','course',id,{subject:b.subject});}
+  else{id=nextId('course');DB.courses.push({id,...data});audit('admin','create','course',id,{subject:b.subject});}
+  const n=regenerate(id);return{id,sessions_generated:n};}
+
+function doTxn(b){if(!b.student_id||!b.amount||!b.type)throw err('缺少必填字段',400);const amt=Number(b.amount);if(amt<=0)throw err('金额需为正',400);
+  const cid=b.course_id||null;DB.transactions.push({id:nextId('txn'),student_id:b.student_id,course_id:cid,amount:amt,type:b.type,method:b.method||null,operator:b.operator||'admin',note:b.note||'',created_at:nowStr()});
+  const acc=ensureAccount(b.student_id,cid);
+  if(b.type==='recharge'){acc.total_recharge+=amt;acc.balance+=amt;if(b.method==='package'&&cid&&b.package_sessions){const e=DB.enrollments.find(x=>x.student_id===b.student_id&&x.course_id===cid);if(e){e.unit_price=amt/Number(b.package_sessions);e.billing_type='package';}}}
+  else acc.balance-=amt;
+  audit('admin',b.type,'transaction',b.student_id,{amount:amt,course_id:cid,method:b.method});return{ok:true};}
+
+function reconcile(sid){const courses=DB.enrollments.filter(e=>e.student_id===sid).map(e=>{const c=DB.courses.find(x=>x.id===e.course_id);const price=unitPriceFor(sid,c.id);
+  const pc=DB.attendance.filter(a=>a.student_id===sid&&a.status==='present'&&DB.sessions.find(s=>s.id===a.session_id&&s.course_id===c.id)).length;
+  const received=DB.transactions.filter(t=>t.student_id===sid&&t.course_id===c.id).reduce((s,t)=>s+(t.type==='recharge'?t.amount:-t.amount),0);
+  const due=pc*price,diff=received-due;const acc=DB.accounts.find(a=>a.student_id===sid&&a.course_id===c.id)||{};
+  return{course_id:c.id,subject:c.subject,price,present_count:pc,received,balance:acc.balance,due,diff,status:diff>=0?`余额充足，可上 ${price?Math.floor(diff/price):0} 节课`:`需补交 ¥${Math.abs(diff).toFixed(2)}`};});
+  const totalRecv=DB.transactions.filter(t=>t.student_id===sid).reduce((s,t)=>s+(t.type==='recharge'?t.amount:-t.amount),0);
+  const totalDue=courses.reduce((s,r)=>s+r.due,0);return{courses,summary:{totalRecv,totalDue,diff:totalRecv-totalDue}};}
+
+function teacherFees(period){DB._paid=DB._paid||{};const rows=DB.teachers.map(t=>{const sessions=DB.sessions.filter(s=>{const c=DB.courses.find(x=>x.id===s.course_id);
+  return c&&c.teacher_id===t.id&&s.date.slice(0,7)===period&&DB.attendance.some(a=>a.session_id===s.id&&a.status==='present');}).length;
+  return{teacher_id:t.id,name:t.name,hourly_fee:t.hourly_fee,sessions,amount:sessions*t.hourly_fee,paid:DB._paid[t.id+'|'+period]?1:0};});return{period,rows};}
+
+function summary(from,to){const income=DB.transactions.filter(t=>t.created_at.slice(0,10)>=from&&t.created_at.slice(0,10)<=to).reduce((s,t)=>s+(t.type==='recharge'?t.amount:-t.amount),0);
+  let teacherFee=0;const map={};DB.sessions.filter(s=>s.date>=from&&s.date<=to&&DB.attendance.some(a=>a.session_id===s.id&&a.status==='present')).forEach(s=>{const c=DB.courses.find(x=>x.id===s.course_id);if(c&&c.teacher_id)map[c.teacher_id]=(map[c.teacher_id]||0)+1;});
+  for(const[tid,cnt]of Object.entries(map)){const t=DB.teachers.find(x=>x.id===Number(tid));if(t)teacherFee+=cnt*t.hourly_fee;}
+  const otherCost=DB.costs.filter(c=>c.incurred_at.slice(0,10)>=from&&c.incurred_at.slice(0,10)<=to).reduce((s,c)=>s+c.amount,0);
+  const totalCost=teacherFee+otherCost,dividable=income-totalCost;
+  return{from,to,income,teacherFee,otherCost,totalCost,dividable,partners:DB.partners.map(p=>({...p,share:dividable*p.ratio}))};}
+
+function dashboard(){const today=TODAY,month=today.slice(0,7);const todaySessions=DB.sessions.filter(s=>s.date===today&&s.status==='scheduled').length;
+  let todayExpected=0;DB.sessions.filter(s=>s.date===today&&s.status==='scheduled').forEach(s=>{todayExpected+=DB.enrollments.filter(e=>e.course_id===s.course_id).length;});
+  const todayPresent=DB.attendance.filter(a=>a.status==='present'&&DB.sessions.find(s=>s.id===a.session_id&&s.date===today)).length;
+  const checkinRate=todayExpected?Math.round(todayPresent/todayExpected*100):0;
+  const owing=new Set(DB.accounts.filter(a=>{const c=DB.courses.find(x=>x.id===a.course_id);if(!c)return false;return a.balance<a.warn_threshold*unitPriceFor(a.student_id,a.course_id);}).map(a=>a.student_id)).size;
+  const monthIncome=DB.transactions.filter(t=>t.created_at.slice(0,7)===month).reduce((s,t)=>s+(t.type==='recharge'?t.amount:-t.amount),0);
+  const map={};DB.sessions.filter(s=>s.date.slice(0,7)===month&&DB.attendance.some(a=>a.session_id===s.id&&a.status==='present')).forEach(s=>{const c=DB.courses.find(x=>x.id===s.course_id);if(c&&c.teacher_id)map[c.teacher_id]=(map[c.teacher_id]||0)+1;});
+  let monthTeacherFee=0;for(const[tid,cnt]of Object.entries(map)){const t=DB.teachers.find(x=>x.id===Number(tid));if(t)monthTeacherFee+=cnt*t.hourly_fee;}
+  return{today,todaySessions,checkinRate,todayPresent,todayExpected,owing,monthIncome,monthTeacherFee,students:DB.students.length,courses:DB.courses.length};}
+
+/* =====================================================================
+   通用前端工具
+   ===================================================================== */
+let toastTimer;
+function toast(msg,ms=2200){let e=document.querySelector('.toast');if(!e){e=document.createElement('div');e.className='toast';document.body.appendChild(e);}e.textContent=msg;e.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.classList.add('hidden'),ms);}
+function money(n){return '¥'+Number(n||0).toFixed(2);}
+function el(html){const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstChild;}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+const WD=['','周一','周二','周三','周四','周五','周六','周日'];
+function statusBadge(s){const map={present:['ok','已签到'],leave:['leave','请假'],absent:['warn','旷课'],canceled:['gray','停课'],'null':['gray','未签到'],scheduled:['blue','未开始']};const[cls,txt]=map[s]||map['null'];return `<span class="badge ${cls}">${txt}</span>`;}
+function openModal(title,content){const bg=el(`<div class="modal-bg"><div class="modal"><h2><span>${esc(title)}</span><button class="close">&times;</button></h2></div></div>`);
+  bg.querySelector('.modal').appendChild(content);const close=()=>bg.remove();bg.querySelector('.close').onclick=close;bg.onclick=e=>{if(e.target===bg)close();};document.body.appendChild(bg);return{close,bg};}
+function SignaturePad(canvas){const ctx=canvas.getContext('2d');function resize(){const r=canvas.getBoundingClientRect();const dpr=window.devicePixelRatio||1;canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx.scale(dpr,dpr);ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#111';}
+  let drawing=false,dirty=false;function pos(e){const r=canvas.getBoundingClientRect();const t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top};}
+  function start(e){drawing=true;dirty=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();}
+  function move(e){if(!drawing)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();e.preventDefault();}function end(){drawing=false;}
+  canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',move);window.addEventListener('mouseup',end);
+  canvas.addEventListener('touchstart',start,{passive:false});canvas.addEventListener('touchmove',move,{passive:false});canvas.addEventListener('touchend',end);setTimeout(resize,0);
+  return{clear(){ctx.clearRect(0,0,canvas.width,canvas.height);dirty=false;},isEmpty(){return !dirty;},dataURL(){return canvas.toDataURL('image/png');}};}
+
+/* =====================================================================
+   屏幕切换 + 登录
+   ===================================================================== */
+function show(screen){['login','student','admin'].forEach(s=>document.getElementById('screen-'+s).classList.toggle('hidden',s!==screen));window.scrollTo(0,0);}
+document.getElementById('roleSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('#roleSeg button').forEach(x=>x.classList.toggle('active',x===b));const admin=b.dataset.role==='admin';
+  document.getElementById('adminForm').classList.toggle('hidden',!admin);document.getElementById('studentForm').classList.toggle('hidden',admin);});
+document.getElementById('studentLogin').onclick=async()=>{const phone=document.getElementById('phone').value.trim();if(!phone)return toast('请输入手机号');
+  try{const r=await api('/api/auth/student-login',{method:'POST',body:{phone}});S.students=r.students;S.currentId=r.students[0].id;show('student');initStudentApp();}catch(e){toast(e.message);}};
+document.getElementById('adminLogin').onclick=async()=>{const pw=document.getElementById('password').value;if(!pw)return toast('请输入密码');
+  try{await api('/api/auth/admin-login',{method:'POST',body:{password:pw}});show('admin');initAdminApp();}catch(e){toast(e.message);}};
+document.getElementById('btnStudentLogout').onclick=()=>show('login');
+document.getElementById('btnAdminLogout').onclick=()=>show('login');
+
+/* =====================================================================
+   学生端
+   ===================================================================== */
+const S={students:[],currentId:null,ttView:'today',ttDate:TODAY};
+function initStudentApp(){const sw=document.getElementById('studentSwitch');sw.innerHTML=S.students.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');sw.value=S.currentId;
+  sw.onchange=()=>{S.currentId=Number(sw.value);studentRenderAll();};studentRenderAll();}
+document.getElementById('studentTabbar').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('#studentTabbar button').forEach(x=>x.classList.toggle('active',x===b));
+  ['checkin','timetable','bill'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hidden',t!==b.dataset.tab));
+  if(b.dataset.tab==='checkin')loadCheckin();if(b.dataset.tab==='timetable')loadTimetable();if(b.dataset.tab==='bill')loadBill();});
+function studentRenderAll(){const s=S.students.find(x=>x.id===S.currentId);document.getElementById('studentName').textContent=s?s.name:'学生端';document.getElementById('studentGrade').textContent=s?s.grade:'';loadCheckin();}
+async function loadCheckin(){const wrap=document.getElementById('tab-checkin');wrap.innerHTML='<div class="empty">加载中…</div>';
+  try{const{date,sessions}=await api(`/api/student/today?studentId=${S.currentId}`);if(!sessions.length){wrap.innerHTML=`<div class="empty">今日（${date}）暂无课程 🎉</div>`;return;}
+    wrap.innerHTML=`<h2 style="font-size:16px">今日待签到 · ${date}</h2>`;
+    sessions.forEach(s=>{const done=s.my_status==='present',leave=s.my_status==='leave';
+      const item=el(`<div class="item"><div class="head"><span class="title">${esc(s.subject)}</span>${statusBadge(s.my_status)}</div>
+        <div class="meta">🕐 ${s.start_time}-${s.end_time} · 👩‍🏫 ${esc(s.teacher||'待定')} · 🏫 ${esc(s.classroom||'待定')}</div>
+        <div class="meta">单价 ${money(s.price)} · 余额 <b style="color:${s.balance<s.price?'var(--warn)':'var(--ok)'}">${money(s.balance)}</b></div>
+        <div class="btn-row mt"></div></div>`);
+      const br=item.querySelector('.btn-row');
+      if(done||leave){br.innerHTML=`<button class="btn secondary" disabled>${done?'已签到 ✓':'已请假'}</button>`;}
+      else{const sign=el('<button class="btn">✍️ 签到</button>');sign.onclick=()=>openSignModal(s);const lv=el('<button class="btn ghost">请假</button>');lv.onclick=()=>requestLeave(s);br.appendChild(sign);br.appendChild(lv);}
+      wrap.appendChild(item);});
+  }catch(e){wrap.innerHTML=`<div class="empty">${esc(e.message)}</div>`;}}
+function openSignModal(s){const body=el(`<div><p class="small muted">课程：<b>${esc(s.subject)}</b> ${s.start_time}-${s.end_time}</p>
+  <p class="small">请确认本人为 <b>${esc(S.students.find(x=>x.id===S.currentId).name)}</b>，并在下方手写签名：</p>
+  <canvas class="sign-pad" id="pad"></canvas><div class="sign-hint">在框内手写签名（防代签留痕凭证）</div>
+  <div class="btn-row"><button class="btn ghost" id="clearSign">清除</button><button class="btn" id="submitSign">确认签到并扣费 ${money(s.price)}</button></div></div>`);
+  const{close}=openModal('手写签到',body);const pad=SignaturePad(body.querySelector('#pad'));body.querySelector('#clearSign').onclick=()=>pad.clear();
+  body.querySelector('#submitSign').onclick=async()=>{if(pad.isEmpty())return toast('请先手写签名');
+    try{const r=await api('/api/student/checkin',{method:'POST',body:{studentId:S.currentId,sessionId:s.session_id,signature:pad.dataURL()}});close();toast(`签到成功，扣费 ${money(r.charged)}，余额 ${money(r.balance)}`);loadCheckin();}catch(e){toast(e.message);}};}
+async function requestLeave(s){if(!confirm(`确认为「${s.subject} ${s.start_time}」请假？请假不扣费、不计课时。`))return;
+  try{await api('/api/student/leave',{method:'POST',body:{studentId:S.currentId,sessionId:s.session_id}});toast('请假成功');loadCheckin();}catch(e){toast(e.message);}}
+async function loadTimetable(){const wrap=document.getElementById('tab-timetable');
+  wrap.innerHTML=`<div class="seg" id="ttSeg"><button data-v="today" class="${S.ttView==='today'?'active':''}">今日</button><button data-v="week" class="${S.ttView==='week'?'active':''}">本周</button><button data-v="date" class="${S.ttView==='date'?'active':''}">按日期</button></div>
+    <div id="ttDatePick" class="${S.ttView==='date'?'':'hidden'}" style="margin-bottom:12px"><input type="date" id="ttDate" value="${S.ttDate}" /></div><div id="ttList"></div>`;
+  wrap.querySelector('#ttSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.ttView=b.dataset.v;loadTimetable();};
+  const dp=wrap.querySelector('#ttDate');if(dp)dp.onchange=()=>{S.ttDate=dp.value;fetchTT();};fetchTT();}
+async function fetchTT(){const list=document.getElementById('ttList');list.innerHTML='<div class="empty">加载中…</div>';
+  try{const query=S.ttView==='date'?`&date=${S.ttDate}`:'';const{sessions,from,to}=await api(`/api/student/timetable?studentId=${S.currentId}&view=${S.ttView}${query}`);
+    if(!sessions.length){list.innerHTML=`<div class="empty">${from===to?from:from+' ~ '+to} 无课程</div>`;return;}
+    let cur='';list.innerHTML='';sessions.forEach(s=>{if(s.date!==cur){cur=s.date;list.appendChild(el(`<h3 style="margin:14px 0 6px;font-size:14px;color:var(--muted)">${s.date}</h3>`));}
+      const st=timeStatus(s.date,s.start_time,s.end_time);
+      list.appendChild(el(`<div class="item"><div class="head"><span class="title">${esc(s.subject)} ${s.enrolled?'':'<span class="badge gray">未报名</span>'}</span>
+        ${s.status==='canceled'?statusBadge('canceled'):`<span class="badge ${st.cls}">${st.txt}</span>`}</div>
+        <div class="meta">🕐 ${s.start_time}-${s.end_time} · 👩‍🏫 ${esc(s.teacher||'待定')} · 🏫 ${esc(s.classroom||'待定')}</div>
+        ${s.my_status?`<div class="meta">我的状态：${statusBadge(s.my_status)}</div>`:''}</div>`));});
+  }catch(e){list.innerHTML=`<div class="empty">${esc(e.message)}</div>`;}}
+function timeStatus(date,start,end){const now=new Date(),s=new Date(`${date}T${start}:00`),e=new Date(`${date}T${end}:00`);if(now<s)return{cls:'blue',txt:'未开始'};if(now>e)return{cls:'gray',txt:'已结束'};return{cls:'ok',txt:'进行中'};}
+async function loadBill(){const wrap=document.getElementById('tab-bill');wrap.innerHTML='<div class="empty">加载中…</div>';
+  try{const{courses,history}=await api(`/api/student/bill?studentId=${S.currentId}`);let html='<h2 style="font-size:16px">课程账户</h2>';
+    if(!courses.length)html+='<div class="empty">暂无报名课程</div>';
+    courses.forEach(c=>{const warn=c.balance<c.warn_threshold*c.price;html+=`<div class="card"><div class="flex-between"><b>${esc(c.subject)}</b><span class="badge ${warn?'warn':'ok'}">${warn?'余额不足':'余额充足'}</span></div>
+      <div class="row"><span class="muted">单价</span><span>${money(c.price)}/节</span></div><div class="row"><span class="muted">已上课</span><span>${c.present_count} 节</span></div>
+      <div class="row"><span class="muted">已请假</span><span>${c.leave_count} 次</span></div><div class="row"><span class="muted">累计充值</span><span>${money(c.total_recharge)}</span></div>
+      <div class="row"><span class="muted">累计消耗</span><span>${money(c.total_consumed)}</span></div><div class="row"><span class="muted">当前余额</span><span style="color:${warn?'var(--warn)':'var(--ok)'};font-weight:700">${money(c.balance)}</span></div>
+      ${warn?'<div class="small" style="color:var(--warn);margin-top:8px">⚠️ 余额偏低，请及时补交学费</div>':''}</div>`;});
+    html+='<h2 style="font-size:16px;margin-top:6px">历史签到记录</h2>';
+    if(!history.length)html+='<div class="empty">暂无记录</div>';else{html+='<div class="table-wrap"><table><thead><tr><th>日期</th><th>科目</th><th>状态</th><th>扣费</th><th>签名</th></tr></thead><tbody>';
+      history.forEach(h=>{html+=`<tr><td>${h.date}<br><span class="small muted">${h.start_time}</span></td><td>${esc(h.subject)}</td><td>${statusBadge(h.status)}</td><td>${h.charged?money(h.charged):'-'}</td>
+        <td>${h.signature?`<img src="${h.signature}" style="height:28px;border:1px solid var(--border);border-radius:4px;cursor:pointer" onclick="showSig('${encodeURIComponent(h.signature)}')" />`:'-'}</td></tr>`;});
+      html+='</tbody></table></div>';}
+    wrap.innerHTML=html;}catch(e){wrap.innerHTML=`<div class="empty">${esc(e.message)}</div>`;}}
+function showSig(enc){openModal('签名凭证',el(`<div style="text-align:center"><img src="${decodeURIComponent(enc)}" style="max-width:100%;border:1px solid var(--border);border-radius:8px" /></div>`));}
+
+/* =====================================================================
+   管理端
+   ===================================================================== */
+const GRADES=['初一','初二','初三','高一','一对一'];let A={cache:{teachers:[],classrooms:[]},courseFilter:'',stuFilter:'',finTab:'txn'};
+const aview=()=>document.getElementById('adminView');
+async function loadRefs(){[A.cache.teachers,A.cache.classrooms]=await Promise.all([api('/api/admin/teachers'),api('/api/admin/classrooms')]);}
+document.getElementById('adminNav').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#adminNav button').forEach(x=>x.classList.toggle('active',x===b));arender(b.dataset.tab);});
+async function initAdminApp(){document.getElementById('todayLbl').textContent=TODAY;await loadRefs();arender('dashboard');}
+async function arender(tab){aview().innerHTML='<div class="empty">加载中…</div>';try{
+  if(tab==='dashboard')return renderDashboard();if(tab==='courses')return renderCourses();if(tab==='students')return renderStudents();
+  if(tab==='teachers')return renderTeachers();if(tab==='finance')return renderFinance();if(tab==='logs')return renderLogs();if(tab==='settings')return renderSettings();
+}catch(e){aview().innerHTML=`<div class="empty">${esc(e.message)}</div>`;}}
+async function renderDashboard(){const d=await api('/api/admin/dashboard');aview().innerHTML=`<div class="stats">
+  <div class="stat"><div class="num">${d.todaySessions}</div><div class="lbl">今日课程数</div></div>
+  <div class="stat"><div class="num">${d.checkinRate}%</div><div class="lbl">今日签到率 (${d.todayPresent}/${d.todayExpected})</div></div>
+  <div class="stat"><div class="num" style="color:var(--warn)">${d.owing}</div><div class="lbl">待补费学生数</div></div>
+  <div class="stat"><div class="num">${money(d.monthIncome)}</div><div class="lbl">本月总营收</div></div>
+  <div class="stat"><div class="num" style="color:var(--leave)">${money(d.monthTeacherFee)}</div><div class="lbl">本月教师应付课时费</div></div>
+  <div class="stat"><div class="num">${d.students}</div><div class="lbl">学生总数</div></div>
+  <div class="stat"><div class="num">${d.courses}</div><div class="lbl">排课总数</div></div></div>
+  <div class="card mt"><b>快捷操作</b><div class="wrap-actions mt">
+    <button class="btn sm" onclick="document.querySelector('#adminNav [data-tab=courses]').click()">➕ 排课管理</button>
+    <button class="btn sm secondary" onclick="document.querySelector('#adminNav [data-tab=finance]').click()">💰 收款登记</button>
+    <button class="btn sm secondary" onclick="document.querySelector('#adminNav [data-tab=students]').click()">👨‍🎓 学生管理</button></div></div>`;}
+async function renderCourses(){const courses=await api('/api/admin/courses');aview().innerHTML=`<div class="flex-between">
+  <select id="cf" style="width:auto"><option value="">全部年级</option>${GRADES.map(g=>`<option ${g===A.courseFilter?'selected':''}>${g}</option>`).join('')}</select>
+  <button class="btn sm" id="addCourse">➕ 新建排课</button></div><div id="courseList" class="mt"></div>`;
+  document.getElementById('cf').onchange=e=>{A.courseFilter=e.target.value;renderCourses();};document.getElementById('addCourse').onclick=()=>courseModal();
+  const list=document.getElementById('courseList');const shown=courses.filter(c=>!A.courseFilter||c.grade===A.courseFilter);
+  if(!shown.length){list.innerHTML='<div class="empty">暂无排课，点击"新建排课"创建</div>';return;}list.innerHTML='';
+  shown.forEach(c=>{const modeTxt=c.mode==='camp'?'集训营':'常规周期';
+    list.appendChild(el(`<div class="item"><div class="head"><span class="title">${esc(c.grade)} · ${esc(c.subject)}</span><span class="badge blue">${modeTxt}</span></div>
+      <div class="meta">🕐 ${c.start_time}-${c.end_time} · 👩‍🏫 ${esc(c.teacher_name||'待定')} · 🏫 ${esc(c.classroom_name||'未分配')}</div>
+      <div class="meta">单价 ${money(c.unit_price)} · 课次 ${c.session_count} · 报名 ${c.enroll_count} 人</div>
+      <div class="wrap-actions mt"><button class="btn sm secondary" data-act="enroll">报名/名单</button><button class="btn sm secondary" data-act="sessions">课次签到</button>
+      <button class="btn sm ghost" data-act="edit">编辑</button><button class="btn sm danger" data-act="del">删除</button></div></div>`));
+    const item=list.lastChild;item.querySelector('[data-act=edit]').onclick=()=>courseModal(c);item.querySelector('[data-act=enroll]').onclick=()=>enrollModal(c);
+    item.querySelector('[data-act=sessions]').onclick=()=>sessionsModal(c);item.querySelector('[data-act=del]').onclick=async()=>{if(!confirm(`删除排课「${c.grade} ${c.subject}」及其所有课次？`))return;await api('/api/admin/courses/'+c.id,{method:'DELETE'});renderCourses();};});}
+function courseModal(c={}){const isCamp=(c.mode||'camp')==='camp';const rest=c.rest_days?JSON.parse(c.rest_days).join(','):'';const wd=c.weekdays?JSON.parse(c.weekdays):[];
+  const body=el(`<div><div class="grid2">
+    <div><label>年级</label><select id="f_grade">${GRADES.map(g=>`<option ${g===c.grade?'selected':''}>${g}</option>`).join('')}</select></div>
+    <div><label>科目</label><input id="f_subject" value="${esc(c.subject||'')}" placeholder="如 数学" /></div>
+    <div><label>任课教师</label><select id="f_teacher"><option value="">未指定</option>${A.cache.teachers.map(t=>`<option value="${t.id}" ${t.id===c.teacher_id?'selected':''}>${esc(t.name)}</option>`).join('')}</select></div>
+    <div><label>教室（必填）</label><select id="f_room"><option value="">请选择</option>${A.cache.classrooms.map(r=>`<option value="${r.id}" ${r.id===c.classroom_id?'selected':''}>${esc(r.name)}</option>`).join('')}</select></div>
+    <div><label>学生单价(元/节)</label><input id="f_price" type="number" value="${c.unit_price??100}" /></div>
+    <div><label>排课模式</label><select id="f_mode"><option value="camp" ${isCamp?'selected':''}>集训营（日期区间）</option><option value="weekly" ${!isCamp?'selected':''}>常规周期（每周循环）</option></select></div>
+    <div><label>上课开始时间</label><input id="f_start" type="time" value="${c.start_time||'09:10'}" /></div>
+    <div><label>上课结束时间</label><input id="f_end" type="time" value="${c.end_time||'10:40'}" /></div></div>
+    <div id="campFields"><div class="grid2"><div><label>开始日期</label><input id="f_sd" type="date" value="${c.start_date||''}" /></div><div><label>结束日期</label><input id="f_ed" type="date" value="${c.end_date||''}" /></div></div>
+      <label>休息日（逗号分隔多个日期，如 2026-08-02,2026-08-09）</label><input id="f_rest" value="${rest}" placeholder="可留空" />
+      <label>总讲次（可留空=按日期区间生成）</label><input id="f_total" type="number" value="${c.total_sessions||''}" placeholder="如 15" /></div>
+    <div id="weeklyFields" class="hidden"><label>每周上课（可多选）</label>
+      <div class="wrap-actions" id="wdBox">${[1,2,3,4,5,6,7].map(d=>`<label class="flex" style="width:auto;margin:0"><input type="checkbox" style="width:auto" value="${d}" ${wd.includes(d)?'checked':''}/> ${WD[d]}</label>`).join('')}</div>
+      <div class="grid2"><div><label>循环开始日期</label><input id="f_wsd" type="date" value="${c.mode==='weekly'?(c.start_date||''):''}" /></div><div><label>循环结束日期</label><input id="f_wed" type="date" value="${c.mode==='weekly'?(c.end_date||''):''}" /></div></div></div>
+    <div id="conflictBox"></div><div class="btn-row mt"><button class="btn" id="saveCourse">保存并生成课次</button></div></div>`);
+  const{close}=openModal(c.id?'编辑排课':'新建排课',body);const modeSel=body.querySelector('#f_mode');
+  const toggle=()=>{const camp=modeSel.value==='camp';body.querySelector('#campFields').classList.toggle('hidden',!camp);body.querySelector('#weeklyFields').classList.toggle('hidden',camp);};modeSel.onchange=toggle;toggle();
+  body.querySelector('#saveCourse').onclick=async()=>{const mode=modeSel.value;const payload={id:c.id,grade:body.querySelector('#f_grade').value,subject:body.querySelector('#f_subject').value.trim(),
+    teacher_id:body.querySelector('#f_teacher').value||null,classroom_id:body.querySelector('#f_room').value||null,unit_price:Number(body.querySelector('#f_price').value)||0,mode,start_time:body.querySelector('#f_start').value,end_time:body.querySelector('#f_end').value};
+    if(mode==='camp'){payload.start_date=body.querySelector('#f_sd').value;payload.end_date=body.querySelector('#f_ed').value;payload.rest_days=body.querySelector('#f_rest').value.split(',').map(s=>s.trim()).filter(Boolean);payload.total_sessions=Number(body.querySelector('#f_total').value)||null;}
+    else{payload.weekdays=[...body.querySelectorAll('#wdBox input:checked')].map(i=>Number(i.value));payload.start_date=body.querySelector('#f_wsd').value;payload.end_date=body.querySelector('#f_wed').value;}
+    if(!payload.subject)return toast('请填写科目');if(!payload.classroom_id)return toast('请分配教室');
+    try{const r=await api('/api/admin/courses',{method:'POST',body:payload});close();toast(`保存成功，生成 ${r.sessions_generated} 个课次`);renderCourses();}
+    catch(e){if(e.status===409&&e.data&&e.data.conflicts){const cb=body.querySelector('#conflictBox');
+      cb.innerHTML=`<div class="card" style="background:#fff7ed;border:1px solid #fdba74;margin-top:12px"><b style="color:var(--warn)">⚠️ 教室时间冲突（${e.data.conflicts.length}）</b>
+        <div class="small mt">${e.data.conflicts.slice(0,8).map(x=>`${x.date} ${x.start_time}-${x.end_time} · ${esc(x.grade)}${esc(x.subject)}`).join('<br>')}</div>
+        <button class="btn sm danger mt" id="forceSave">仍然保存（忽略冲突）</button></div>`;
+      cb.querySelector('#forceSave').onclick=async()=>{payload.force=true;const r=await api('/api/admin/courses',{method:'POST',body:payload});close();toast(`已保存，生成 ${r.sessions_generated} 个课次`);renderCourses();};}else toast(e.message);}};}
+async function enrollModal(c){const[roster,allStudents]=await Promise.all([api('/api/admin/courses/'+c.id+'/enrollments'),api('/api/admin/students'+(c.grade==='一对一'?'':'?grade='+encodeURIComponent(c.grade)))]);
+  const enrolledIds=new Set(roster.map(r=>r.student_id));const body=el(`<div><p class="small muted">课程：${esc(c.grade)} ${esc(c.subject)} · 默认单价 ${money(c.unit_price)}</p>
+    <div class="flex mt"><select id="addStu" style="flex:1">${allStudents.filter(s=>!enrolledIds.has(s.id)).map(s=>`<option value="${s.id}">${esc(s.name)} (${esc(s.grade)})</option>`).join('')||'<option value="">无可添加学生</option>'}</select>
+    <input id="addPrice" type="number" placeholder="优惠单价(可空)" style="width:120px" /><button class="btn sm" id="doEnroll">报名</button></div>
+    <div class="table-wrap mt"><table><thead><tr><th>姓名</th><th>单价</th><th>余额</th><th></th></tr></thead><tbody id="rosterBody"></tbody></table></div></div>`);
+  openModal(`报名名单 · ${c.subject}`,body);
+  function fill(rows){const tb=body.querySelector('#rosterBody');tb.innerHTML=rows.length?'':'<tr><td colspan="4" class="muted">暂无报名</td></tr>';
+    rows.forEach(r=>{const tr=el(`<tr><td>${esc(r.name)}</td><td>${money(r.unit_price??c.unit_price)}</td><td>${money(r.balance||0)}</td><td><button class="btn sm danger">移除</button></td></tr>`);
+      tr.querySelector('button').onclick=async()=>{if(!confirm('移除该学生报名？'))return;await api('/api/admin/enrollments/'+r.id,{method:'DELETE'});const nr=await api('/api/admin/courses/'+c.id+'/enrollments');fill(nr);};tb.appendChild(tr);});}
+  fill(roster);body.querySelector('#doEnroll').onclick=async()=>{const sid=body.querySelector('#addStu').value;if(!sid)return;const price=body.querySelector('#addPrice').value;
+    try{await api('/api/admin/enrollments',{method:'POST',body:{student_id:Number(sid),course_id:c.id,unit_price:price?Number(price):null}});toast('报名成功');enrollModal(c);}catch(e){toast(e.message);}};}
+async function sessionsModal(c){const sessions=await api('/api/admin/courses/'+c.id+'/sessions');const body=el(`<div><p class="small muted">共 ${sessions.length} 个课次，点击查看/代录签到</p><div id="sess"></div></div>`);
+  openModal(`课次 · ${c.subject}`,body);const box=body.querySelector('#sess');
+  sessions.forEach(s=>{const it=el(`<div class="item" style="padding:10px"><div class="flex-between"><div><b>第${s.seq}讲</b> ${s.date} <span class="small muted">${s.start_time}-${s.end_time}</span>${s.status==='canceled'?statusBadge('canceled'):''}</div>
+    <div class="wrap-actions"><span class="badge ok">签${s.present}</span><span class="badge leave">假${s.leave_cnt}</span><button class="btn sm secondary" data-a="roster">名单</button><button class="btn sm ghost" data-a="cancel">${s.status==='canceled'?'恢复':'停课'}</button></div></div></div>`);
+    it.querySelector('[data-a=roster]').onclick=()=>rosterModal(s.id,c);it.querySelector('[data-a=cancel]').onclick=async()=>{await api('/api/admin/sessions/'+s.id+'/cancel',{method:'POST',body:{cancel:s.status!=='canceled'}});sessionsModal(c);};box.appendChild(it);});}
+async function rosterModal(sessionId,c){const{session,roster}=await api('/api/admin/sessions/'+sessionId+'/roster');
+  const body=el(`<div><p class="small muted">${session.date} ${session.start_time}-${session.end_time} · ${esc(c.subject)}</p><div class="table-wrap"><table><thead><tr><th>姓名</th><th>状态</th><th>代录</th></tr></thead><tbody id="rb"></tbody></table></div></div>`);
+  openModal('课次签到名单',body);const tb=body.querySelector('#rb');
+  roster.forEach(r=>{const tr=el(`<tr><td>${esc(r.name)}</td><td>${statusBadge(r.status)}</td><td><select style="width:auto"><option value="">-</option>
+    <option value="present" ${r.status==='present'?'selected':''}>正常签到</option><option value="leave" ${r.status==='leave'?'selected':''}>请假</option><option value="absent" ${r.status==='absent'?'selected':''}>旷课</option></select></td></tr>`);
+    tr.querySelector('select').onchange=async e=>{if(!e.target.value)return;await api('/api/admin/attendance',{method:'POST',body:{student_id:r.student_id,session_id:sessionId,status:e.target.value}});toast('已更新');rosterModal(sessionId,c);};tb.appendChild(tr);});}
+async function renderStudents(){const students=await api('/api/admin/students'+(A.stuFilter?'?grade='+encodeURIComponent(A.stuFilter):''));
+  aview().innerHTML=`<div class="flex-between"><select id="sf" style="width:auto"><option value="">全部年级</option>${GRADES.map(g=>`<option ${g===A.stuFilter?'selected':''}>${g}</option>`).join('')}</select><button class="btn sm" id="addStudent">➕ 新增学生</button></div>
+    <div class="table-wrap mt"><table><thead><tr><th>姓名</th><th>年级</th><th>家长手机</th><th>报名日期</th><th></th></tr></thead><tbody id="stb"></tbody></table></div>`;
+  document.getElementById('sf').onchange=e=>{A.stuFilter=e.target.value;renderStudents();};document.getElementById('addStudent').onclick=()=>studentModal();
+  const tb=document.getElementById('stb');tb.innerHTML=students.length?'':'<tr><td colspan="5" class="muted">暂无学生</td></tr>';
+  students.forEach(s=>{const tr=el(`<tr><td>${esc(s.name)}</td><td>${esc(s.grade)}</td><td>${esc(s.guardian_phone||'-')}</td><td>${esc(s.enroll_date||'-')}</td><td class="wrap-actions"><button class="btn sm secondary" data-a="bill">对账</button><button class="btn sm ghost" data-a="edit">编辑</button></td></tr>`);
+    tr.querySelector('[data-a=edit]').onclick=()=>studentModal(s);tr.querySelector('[data-a=bill]').onclick=()=>reconcileModal(s);tb.appendChild(tr);});}
+function studentModal(s={}){const body=el(`<div><label>姓名</label><input id="s_name" value="${esc(s.name||'')}" /><label>年级</label><select id="s_grade">${GRADES.map(g=>`<option ${g===s.grade?'selected':''}>${g}</option>`).join('')}</select>
+  <label>家长手机号（登录账号）</label><input id="s_phone" value="${esc(s.guardian_phone||'')}" /><label>报名日期</label><input id="s_date" type="date" value="${s.enroll_date||TODAY}" /><label>备注</label><input id="s_note" value="${esc(s.note||'')}" />
+  <div class="btn-row mt"><button class="btn" id="saveStu">保存</button></div></div>`);
+  const{close}=openModal(s.id?'编辑学生':'新增学生',body);body.querySelector('#saveStu').onclick=async()=>{const payload={id:s.id,name:body.querySelector('#s_name').value.trim(),grade:body.querySelector('#s_grade').value,guardian_phone:body.querySelector('#s_phone').value.trim(),enroll_date:body.querySelector('#s_date').value,note:body.querySelector('#s_note').value};
+    if(!payload.name)return toast('请填写姓名');await api('/api/admin/students',{method:'POST',body:payload});close();toast('已保存');renderStudents();};}
+async function reconcileModal(s){const r=await api('/api/admin/finance/reconcile/'+s.id);const body=el(`<div><div class="card" style="background:#eef2ff">
+    <div class="row"><span>累计已收</span><b>${money(r.summary.totalRecv)}</b></div><div class="row"><span>累计应收</span><b>${money(r.summary.totalDue)}</b></div>
+    <div class="row"><span>差额</span><b style="color:${r.summary.diff>=0?'var(--ok)':'var(--warn)'}">${money(r.summary.diff)} ${r.summary.diff>=0?'(余)':'(欠)'}</b></div></div>
+    <div class="table-wrap"><table><thead><tr><th>科目</th><th>已上</th><th>应收</th><th>已收</th><th>结论</th></tr></thead><tbody>
+    ${r.courses.map(c=>`<tr><td>${esc(c.subject)}</td><td>${c.present_count}</td><td>${money(c.due)}</td><td>${money(c.received)}</td><td style="color:${c.diff>=0?'var(--ok)':'var(--warn)'}">${esc(c.status)}</td></tr>`).join('')}
+    </tbody></table></div><div class="btn-row mt"><button class="btn secondary" id="goRecharge">为该生充值/退款</button></div></div>`);
+  openModal(`多退少补 · ${s.name}`,body);body.querySelector('#goRecharge').onclick=()=>txnModal(s);}
+async function renderTeachers(){const teachers=await api('/api/admin/teachers');A.cache.teachers=teachers;
+  aview().innerHTML=`<div class="flex-between"><b>教师管理</b><button class="btn sm" id="addT">➕ 新增教师</button></div><div class="table-wrap mt"><table><thead><tr><th>姓名</th><th>擅长科目</th><th>课时费</th><th></th></tr></thead><tbody id="ttb"></tbody></table></div>`;
+  document.getElementById('addT').onclick=()=>teacherModal();const tb=document.getElementById('ttb');
+  teachers.forEach(t=>{const tr=el(`<tr><td>${esc(t.name)}</td><td>${esc(t.subjects||'-')}</td><td>${money(t.hourly_fee)}/节</td><td><button class="btn sm ghost">编辑</button></td></tr>`);tr.querySelector('button').onclick=()=>teacherModal(t);tb.appendChild(tr);});}
+function teacherModal(t={}){const body=el(`<div><label>姓名</label><input id="t_name" value="${esc(t.name||'')}" /><label>联系方式</label><input id="t_phone" value="${esc(t.phone||'')}" /><label>擅长科目</label><input id="t_subj" value="${esc(t.subjects||'')}" placeholder="如 数学,物理" /><label>单节课时费(元)</label><input id="t_fee" type="number" value="${t.hourly_fee??300}" /><div class="btn-row mt"><button class="btn" id="saveT">保存</button></div></div>`);
+  const{close}=openModal(t.id?'编辑教师':'新增教师',body);body.querySelector('#saveT').onclick=async()=>{const payload={id:t.id,name:body.querySelector('#t_name').value.trim(),phone:body.querySelector('#t_phone').value,subjects:body.querySelector('#t_subj').value,hourly_fee:Number(body.querySelector('#t_fee').value)||0};
+    if(!payload.name)return toast('请填写姓名');await api('/api/admin/teachers',{method:'POST',body:payload});close();toast('已保存');await loadRefs();renderTeachers();};}
+async function renderFinance(){aview().innerHTML=`<div class="seg" id="finSeg"><button data-f="txn" class="${A.finTab==='txn'?'active':''}">收退款</button><button data-f="teacher" class="${A.finTab==='teacher'?'active':''}">教师结算</button><button data-f="summary" class="${A.finTab==='summary'?'active':''}">总账/分红</button></div><div id="finBody"></div>`;
+  document.getElementById('finSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;A.finTab=b.dataset.f;renderFinance();};
+  if(A.finTab==='txn')return finTxn();if(A.finTab==='teacher')return finTeacher();if(A.finTab==='summary')return finSummary();}
+async function finTxn(){const box=document.getElementById('finBody');const txns=await api('/api/admin/finance/transactions');
+  box.innerHTML=`<button class="btn" id="newTxn">➕ 收款 / 退款登记</button><div class="table-wrap mt"><table><thead><tr><th>时间</th><th>学生</th><th>科目</th><th>类型</th><th>金额</th><th>方式</th><th>经手</th></tr></thead><tbody>
+    ${txns.map(t=>`<tr><td class="small">${esc((t.created_at||'').slice(5,16))}</td><td>${esc(t.student_name)}</td><td>${esc(t.subject||'整体')}</td><td>${t.type==='recharge'?'<span class="badge ok">充值</span>':'<span class="badge warn">退款</span>'}</td><td>${money(t.amount)}</td><td class="small">${esc(t.method||'-')}</td><td class="small">${esc(t.operator||'-')}</td></tr>`).join('')||'<tr><td colspan="7" class="muted">暂无流水</td></tr>'}</tbody></table></div>`;
+  box.querySelector('#newTxn').onclick=()=>txnModal();}
+async function txnModal(preStudent){const students=await api('/api/admin/students');
+  const body=el(`<div><label>学生</label><select id="x_stu">${students.map(s=>`<option value="${s.id}" ${preStudent&&preStudent.id===s.id?'selected':''}>${esc(s.name)} (${esc(s.grade)})</option>`).join('')}</select>
+    <label>课程（可选，整体充值留空）</label><select id="x_course"><option value="">整体账户</option></select>
+    <label>类型</label><select id="x_type"><option value="recharge">充值 / 收款</option><option value="refund">退款</option></select>
+    <label>收款方式</label><select id="x_method"><option value="prestore">预存充值</option><option value="package">打包报名(套餐)</option><option value="refund">退款</option></select>
+    <div id="pkgBox" class="hidden"><label>套餐总课时（用于折算单价）</label><input id="x_pkg" type="number" placeholder="如 30" /></div>
+    <label>金额(元)</label><input id="x_amount" type="number" placeholder="如 3000" /><label>经手人</label><input id="x_op" value="admin" /><label>备注</label><input id="x_note" />
+    <div class="btn-row mt"><button class="btn" id="saveTxn">提交</button></div></div>`);
+  const{close}=openModal('收款 / 退款登记',body);const stuSel=body.querySelector('#x_stu'),courseSel=body.querySelector('#x_course');
+  async function loadCourses(){const enr=await api('/api/admin/finance/reconcile/'+stuSel.value).catch(()=>({courses:[]}));courseSel.innerHTML='<option value="">整体账户</option>'+enr.courses.map(c=>`<option value="${c.course_id}">${esc(c.subject)}</option>`).join('');}
+  loadCourses();stuSel.onchange=loadCourses;body.querySelector('#x_method').onchange=e=>body.querySelector('#pkgBox').classList.toggle('hidden',e.target.value!=='package');
+  body.querySelector('#x_type').onchange=e=>{if(e.target.value==='refund')body.querySelector('#x_method').value='refund';};
+  body.querySelector('#saveTxn').onclick=async()=>{const payload={student_id:Number(stuSel.value),course_id:courseSel.value?Number(courseSel.value):null,amount:Number(body.querySelector('#x_amount').value),type:body.querySelector('#x_type').value,method:body.querySelector('#x_method').value,operator:body.querySelector('#x_op').value,note:body.querySelector('#x_note').value,package_sessions:Number(body.querySelector('#x_pkg').value)||null};
+    if(!payload.amount||payload.amount<=0)return toast('请输入正确金额');try{await api('/api/admin/finance/transaction',{method:'POST',body:payload});close();toast('已登记');if(A.finTab==='txn')finTxn();}catch(e){toast(e.message);}};}
+async function finTeacher(){const box=document.getElementById('finBody');const period=TODAY.slice(0,7);const{rows}=await api('/api/admin/finance/teacher-fees?period='+period);
+  box.innerHTML=`<p class="muted small">结算月份：${period}（按实际有签到的课次计算）</p><div class="table-wrap"><table><thead><tr><th>教师</th><th>课时费</th><th>实际课次</th><th>应付</th><th>状态</th></tr></thead><tbody id="tf"></tbody></table></div>`;
+  const tb=box.querySelector('#tf');rows.forEach(r=>{const tr=el(`<tr><td>${esc(r.name)}</td><td>${money(r.hourly_fee)}</td><td>${r.sessions}</td><td>${money(r.amount)}</td><td>${r.paid?'<span class="badge ok">已付</span>':(r.amount>0?'<button class="btn sm">标记已付</button>':'<span class="muted small">无</span>')}</td></tr>`);
+    const btn=tr.querySelector('button');if(btn)btn.onclick=async()=>{await api('/api/admin/finance/teacher-fees/pay',{method:'POST',body:{teacher_id:r.teacher_id,period,sessions:r.sessions,amount:r.amount}});toast('已标记');finTeacher();};tb.appendChild(tr);});}
+async function finSummary(){const box=document.getElementById('finBody');const from=TODAY.slice(0,7)+'-01',to=TODAY;
+  box.innerHTML=`<div class="flex mt"><input type="date" id="sfrom" value="${from}" /><span>至</span><input type="date" id="sto" value="${to}" /><button class="btn sm" id="q">查询</button></div><div id="sumBody" class="mt"></div>
+    <div class="card mt"><div class="flex-between"><b>成本录入（场地/耗材等）</b></div><div class="flex mt"><input id="cn" placeholder="成本名称" style="flex:1" /><input id="ca" type="number" placeholder="金额" style="width:110px" /><button class="btn sm" id="addCost">录入</button></div></div>`;
+  const run=async()=>{const f=box.querySelector('#sfrom').value,t=box.querySelector('#sto').value;const d=await api(`/api/admin/finance/summary?from=${f}&to=${t}`);
+    box.querySelector('#sumBody').innerHTML=`<div class="card"><div class="row"><span>总收入</span><b style="color:var(--ok)">${money(d.income)}</b></div><div class="row"><span>教师课时费</span><span>${money(d.teacherFee)}</span></div>
+      <div class="row"><span>其他成本</span><span>${money(d.otherCost)}</span></div><div class="row"><span>总支出</span><b style="color:var(--warn)">${money(d.totalCost)}</b></div><div class="row"><span>可分红金额</span><b style="color:var(--brand);font-size:18px">${money(d.dividable)}</b></div></div>
+      <div class="card"><b>分红明细</b>${d.partners.length?d.partners.map(p=>`<div class="row"><span>${esc(p.name)} (${(p.ratio*100).toFixed(0)}%)</span><b>${money(p.share)}</b></div>`).join(''):'<div class="muted small mt">未配置负责人，请到「设置」添加</div>'}</div>`;};
+  box.querySelector('#q').onclick=run;run();
+  box.querySelector('#addCost').onclick=async()=>{const name=box.querySelector('#cn').value.trim(),amount=Number(box.querySelector('#ca').value);if(!name||!amount)return toast('请填写成本名称与金额');await api('/api/admin/finance/costs',{method:'POST',body:{name,amount}});toast('已录入');run();};}
+async function renderLogs(){const logs=await api('/api/admin/logs');aview().innerHTML=`<h2 style="font-size:16px">操作日志</h2><div class="table-wrap"><table><thead><tr><th>时间</th><th>操作人</th><th>动作</th><th>对象</th><th>详情</th></tr></thead><tbody>
+    ${logs.map(l=>`<tr><td class="small">${esc((l.created_at||'').slice(5,16))}</td><td>${esc(l.actor||'-')}</td><td>${esc(l.action)}</td><td class="small">${esc(l.entity)}#${esc(l.entity_id)}</td><td class="small muted">${esc(l.detail||'')}</td></tr>`).join('')||'<tr><td colspan="5" class="muted">暂无日志</td></tr>'}</tbody></table></div>`;}
+async function renderSettings(){const[settings,classrooms,partners]=await Promise.all([api('/api/admin/settings'),api('/api/admin/classrooms'),api('/api/admin/partners')]);
+  aview().innerHTML=`<div class="card"><b>业务规则</b><label>旷课是否扣费</label><select id="set_absent"><option value="1" ${settings.absent_charge==='1'?'selected':''}>扣费（默认）</option><option value="0" ${settings.absent_charge==='0'?'selected':''}>不扣费</option></select>
+    <label>请假需提前小时数</label><input id="set_lead" type="number" value="${settings.leave_lead_hours||2}" /><label>修改管理员密码（留空不改）</label><input id="set_pw" type="password" placeholder="新密码" /><div class="btn-row mt"><button class="btn" id="saveSet">保存规则</button></div></div>
+    <div class="card"><b>教室管理（4 间可增删）</b><div id="roomList" class="mt"></div><div class="flex mt"><input id="newRoom" placeholder="新教室名称" style="flex:1" /><button class="btn sm" id="addRoom">添加</button></div></div>
+    <div class="card"><b>分红负责人比例</b><div id="partnerList" class="mt"></div><div class="flex mt"><input id="pName" placeholder="姓名" style="flex:1" /><input id="pRatio" type="number" step="0.05" placeholder="比例 如 0.5" style="width:120px" /><button class="btn sm" id="addPartner">添加</button></div><p class="small muted mt">提示：各负责人比例之和建议为 1（100%）。</p></div>`;
+  document.getElementById('saveSet').onclick=async()=>{const body={absent_charge:document.getElementById('set_absent').value,leave_lead_hours:document.getElementById('set_lead').value};const pw=document.getElementById('set_pw').value;if(pw)body.admin_password=pw;await api('/api/admin/settings',{method:'POST',body});toast('已保存');};
+  const roomList=document.getElementById('roomList');roomList.innerHTML=classrooms.map(r=>`<div class="flex-between" style="padding:5px 0"><span>${esc(r.name)}</span><button class="btn sm danger" data-id="${r.id}">删除</button></div>`).join('')||'<span class="muted small">暂无教室</span>';
+  roomList.querySelectorAll('button').forEach(b=>b.onclick=async()=>{await api('/api/admin/classrooms/'+b.dataset.id,{method:'DELETE'});await loadRefs();renderSettings();});
+  document.getElementById('addRoom').onclick=async()=>{const name=document.getElementById('newRoom').value.trim();if(!name)return;await api('/api/admin/classrooms',{method:'POST',body:{name}});await loadRefs();renderSettings();};
+  const pl=document.getElementById('partnerList');pl.innerHTML=partners.map(p=>`<div class="flex-between" style="padding:5px 0"><span>${esc(p.name)} · ${(p.ratio*100).toFixed(0)}%</span><button class="btn sm danger" data-id="${p.id}">删除</button></div>`).join('')||'<span class="muted small">暂无</span>';
+  pl.querySelectorAll('button').forEach(b=>b.onclick=async()=>{await api('/api/admin/partners/'+b.dataset.id,{method:'DELETE'});renderSettings();});
+  document.getElementById('addPartner').onclick=async()=>{const name=document.getElementById('pName').value.trim(),ratio=Number(document.getElementById('pRatio').value);if(!name)return toast('请填写姓名');await api('/api/admin/partners',{method:'POST',body:{name,ratio}});renderSettings();};}
+</script>
+</body>
+</html>
