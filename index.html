@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>少林功夫娘 · 嵩山闯关</title>
+  <meta name="description" content="中华娘造型的功夫小女孩，闯荡嵩山少林寺的横版动作闯关游戏。" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="game-shell">
+    <canvas id="game" width="960" height="540"></canvas>
+
+    <!-- 顶部状态条 -->
+    <div id="hud" class="hidden">
+      <div class="hud-left">
+        <div class="hud-name">功夫娘 · 小嵩</div>
+        <div class="bar hp"><span class="bar-label">气血</span><div class="bar-track"><i id="hp-fill"></i></div></div>
+        <div class="bar chi"><span class="bar-label">内力</span><div class="bar-track"><i id="chi-fill"></i></div></div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-stat">关卡 <b id="stage-num">1</b>／5</div>
+        <div class="hud-stat">铜钱 <b id="coins">0</b></div>
+        <div class="hud-stat">得分 <b id="score">0</b></div>
+      </div>
+    </div>
+
+    <!-- 开始界面 -->
+    <div id="title-screen" class="overlay">
+      <div class="lantern lantern-l">囍</div>
+      <div class="lantern lantern-r">福</div>
+      <h1 class="title-main">少林功夫娘</h1>
+      <p class="title-sub">嵩 山 闯 关</p>
+      <div class="scroll-box">
+        <p>相传嵩山少林，藏经失窃，群魔乱入。</p>
+        <p>红衣功夫娘 <b>小嵩</b> 单枪匹马，闯山门、破塔林、入大殿，</p>
+        <p>连过五关，讨回真经！</p>
+      </div>
+      <button id="btn-start" class="btn-primary">开始闯关</button>
+      <button id="btn-help" class="btn-ghost">操作说明</button>
+    </div>
+
+    <!-- 操作说明 -->
+    <div id="help-screen" class="overlay hidden">
+      <h2 class="panel-title">操作说明</h2>
+      <div class="help-grid">
+        <div class="help-col">
+          <h3>键盘</h3>
+          <ul>
+            <li><kbd>←</kbd> <kbd>→</kbd> / <kbd>A</kbd> <kbd>D</kbd> 　移动</li>
+            <li><kbd>↑</kbd> / <kbd>W</kbd> / <kbd>空格</kbd> 　跳跃（可二段跳）</li>
+            <li><kbd>J</kbd> 　出拳</li>
+            <li><kbd>K</kbd> 　飞踢</li>
+            <li><kbd>L</kbd> 　气功波（消耗内力）</li>
+            <li><kbd>P</kbd> 　暂停</li>
+          </ul>
+        </div>
+        <div class="help-col">
+          <h3>玩法</h3>
+          <ul>
+            <li>击败挡路的妖人，一路向右到达 <b>关门</b> 过关。</li>
+            <li>吃 <b>🥟 包子</b> 回气血，拾 <b>🍶 葫芦</b> 补内力。</li>
+            <li>捡 <b>铜钱</b> 得分，连续击杀可累积连击加分。</li>
+            <li>第五关击败 <b>魔头</b> 讨回真经，通关！</li>
+          </ul>
+        </div>
+      </div>
+      <p class="help-touch">📱 手机端屏幕下方有虚拟按键。</p>
+      <button id="btn-help-back" class="btn-primary">返回</button>
+    </div>
+
+    <!-- 过关界面 -->
+    <div id="clear-screen" class="overlay hidden">
+      <h2 class="panel-title" id="clear-title">过关！</h2>
+      <div class="scroll-box" id="clear-detail"></div>
+      <button id="btn-next" class="btn-primary">进入下一关</button>
+    </div>
+
+    <!-- 结算 / 失败界面 -->
+    <div id="end-screen" class="overlay hidden">
+      <h2 class="panel-title" id="end-title"></h2>
+      <div class="scroll-box" id="end-detail"></div>
+      <button id="btn-retry" class="btn-primary">再战一局</button>
+    </div>
+
+    <!-- 暂停 -->
+    <div id="pause-screen" class="overlay hidden">
+      <h2 class="panel-title">暂停</h2>
+      <button id="btn-resume" class="btn-primary">继续</button>
+      <button id="btn-quit" class="btn-ghost">回到标题</button>
+    </div>
+
+    <!-- 关卡横幅 -->
+    <div id="stage-banner" class="hidden"><span id="stage-banner-text"></span></div>
+
+    <!-- 触屏虚拟按键 -->
+    <div id="touch-controls" class="hidden">
+      <div class="touch-dpad">
+        <button class="tbtn" data-key="left">◀</button>
+        <button class="tbtn" data-key="right">▶</button>
+      </div>
+      <div class="touch-actions">
+        <button class="tbtn act-jump" data-key="jump">跳</button>
+        <button class="tbtn act-punch" data-key="punch">拳</button>
+        <button class="tbtn act-kick" data-key="kick">踢</button>
+        <button class="tbtn act-special" data-key="special">波</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sprites.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
