@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>小克做视频</title>
+<style>
+/* 布局：一块 16:9 的"纸面"舞台居中，下方一条手账风格的控制条 */
+@font-face { font-family: "KuaiLe"; src: url("assets/kuaile.woff2") format("woff2"); font-display: block; }
+:root {
+  --bg: #efe6d2; --fg: #2d2a32; --muted: #6f6656; --card: #fbf5e6; --line: #2d2a32;
+  --accent: #f0885a; --accent-ink: #2d2a32; --xray: #18c8d8;
+  --display: "KuaiLe", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --body: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1f1c22; --fg: #f3ead8; --muted: #b3a891; --card: #2b2730; --line: #f3ead8; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #1f1c22; --fg: #f3ead8; --muted: #b3a891; --card: #2b2730; --line: #f3ead8; color-scheme: dark }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); padding: 20px 16px 28px; }
+#wrap { max-width: 1280px; margin: 0 auto; display: grid; gap: 12px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(26px, 4vw, 40px); margin: 0; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); font-size: 14px; }
+#stage { position: relative; width: 100%; aspect-ratio: 16 / 9; max-width: 100%; border: 3px solid var(--line); border-radius: 14px 18px 12px 16px; overflow: hidden; background: #fbf5e6; box-shadow: 5px 6px 0 rgba(0,0,0,.18); }
+#cv { width: 100%; height: 100%; display: block; }
+.overlay { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 14px; text-align: center; color: #2d2a32; }
+.hidden { display: none !important; }
+#start { background: rgba(251,245,230,.25); }
+#bigplay { width: clamp(76px, 11vw, 130px); aspect-ratio: 1; border-radius: 50%; border: 4px solid #2d2a32; background: var(--accent); color: #2d2a32; font-size: clamp(30px, 4.5vw, 54px); cursor: pointer; box-shadow: 4px 5px 0 #2d2a32; padding-left: .2em; transition: transform .15s; }
+#bigplay:hover { transform: scale(1.06) rotate(-3deg); }
+.hint { font-family: var(--display); font-size: clamp(16px, 2.2vw, 26px); background: #fffaf0; border: 3px solid #2d2a32; border-radius: 12px; padding: 4px 14px; }
+#end { background: rgba(251,245,230,.82); }
+#end h2 { font-family: var(--display); font-weight: 400; font-size: clamp(22px, 3.6vw, 46px); margin: 0; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding-inline: 16px; }
+#name { font-family: var(--display); font-size: clamp(18px, 2.4vw, 28px); padding: 8px 14px; border: 3px solid #2d2a32; border-radius: 12px; width: min(320px, 70vw); background: #fff; color: #2d2a32; }
+.btn { font-family: var(--display); font-size: clamp(16px, 2vw, 24px); padding: 8px 18px; border: 3px solid #2d2a32; border-radius: 12px; background: var(--accent); color: #2d2a32; cursor: pointer; box-shadow: 3px 4px 0 #2d2a32; }
+.btn.ghost { background: #fffaf0; }
+#certbar { position: absolute; left: 0; right: 0; bottom: 10px; }
+#certimg { position: absolute; inset: 0; background: rgba(45,42,50,.75); display: grid; place-items: center; gap: 10px; align-content: center; color: #fff; padding: 12px; }
+#certimg img { max-width: 80%; max-height: 70%; border: 3px solid #fff; border-radius: 8px; }
+#loading { background: #fbf5e6; font-family: var(--display); font-size: 28px; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: var(--card); border: 2px solid var(--line); border-radius: 12px; padding: 8px 12px; }
+.bar button { font-family: var(--display); font-size: 17px; border: 2px solid var(--line); background: transparent; color: var(--fg); border-radius: 10px; padding: 4px 12px; cursor: pointer; }
+.bar button.on { background: var(--accent); color: var(--accent-ink); }
+#xray.on { background: var(--xray); }
+#play { min-width: 48px; }
+#seek { flex: 1 1 200px; min-width: 0; accent-color: var(--accent); }
+#time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 14px; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--xray); outline-offset: 2px; }
+.keys { color: var(--muted); font-size: 13px; margin: 0; }
+body.render { padding: 0; background: #000; }
+body.render header, body.render .bar, body.render .keys, body.render .overlay { display: none !important; }
+body.render #stage { border: 0; border-radius: 0; box-shadow: none; width: 1920px; }
+@media (prefers-reduced-motion: reduce) { #bigplay { transition: none; } }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <header>
+    <h1>一个只会打字的 AI，怎么做出视频？</h1>
+    <p>小克（Claude Opus 5.5 的卡通替身）讲给你听 · 约 4 分钟 · 请打开声音</p>
+  </header>
+  <div id="stage">
+    <canvas id="cv" width="1920" height="1080" aria-label="动画视频画面"></canvas>
+    <div id="loading" class="overlay">小克正在削铅笔……</div>
+    <div id="start" class="overlay">
+      <button id="bigplay" aria-label="播放">▶</button>
+      <div class="hint">点一下开始（有配音和音乐）</div>
+    </div>
+    <div id="end" class="overlay hidden">
+      <h2>写下你的名字，领一张毕业证书</h2>
+      <div class="row">
+        <input id="name" type="text" maxlength="12" placeholder="你的名字" autocomplete="off">
+        <button id="getcert" class="btn">领取证书</button>
+      </div>
+      <div class="row"><button id="replay" class="btn ghost">再看一遍</button></div>
+    </div>
+    <div id="certbar" class="overlay hidden" style="position:absolute;inset:auto 0 10px 0;">
+      <div class="row"><button id="save" class="btn">保存证书</button><button id="again" class="btn ghost">再看一遍</button></div>
+    </div>
+    <div id="certimg" class="hidden">
+      <img id="certpng" alt="你的毕业证书">
+      <div>右键或长按图片即可保存</div>
+      <button id="closeimg" class="btn ghost">好的</button>
+    </div>
+  </div>
+  <div class="bar">
+    <button id="play" aria-label="播放/暂停">▶</button>
+    <input id="seek" type="range" min="0" max="1000" value="0" aria-label="进度">
+    <span id="time">0:00 / 0:00</span>
+    <button id="subs" class="on">字幕</button>
+    <button id="xray">透视</button>
+    <button id="fs">全屏</button>
+  </div>
+  <p class="keys">空格 播放/暂停 · ← → 快退/快进 5 秒 · X 透视 · C 字幕 · F 全屏</p>
+</div>
+<audio id="au" src="audio/soundtrack.mp3" preload="auto"></audio>
+<script src="js/script.js"></script>
+<script src="js/timing.js"></script>
+<script src="js/stats.js"></script>
+<script src="js/cue.js"></script>
+<script src="js/music.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/characters.js"></script>
+<script src="js/scenes.js"></script>
+<script src="js/player.js"></script>
+</body>
+</html>
