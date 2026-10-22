@@ -1,0 +1,9 @@
+_work/
+node_modules/
+honghu-video/out/seg/
+honghu-video/out/stills/
+honghu-video/out/video_*.mp4
+honghu-video/out/*.wav
+honghu-video/out/*.log
+__pycache__/
+honghu-video/out/video_nosound.mp4

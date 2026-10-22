@@ -1,0 +1,12 @@
+{
+  "name": "honghu-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "node src/render.js",
+    "still": "node src/still.js"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^1.0.13"
+  }
+}
