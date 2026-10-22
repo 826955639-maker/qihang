@@ -7,3 +7,4 @@ honghu-video/out/*.wav
 honghu-video/out/*.log
 __pycache__/
 honghu-video/out/video_nosound.mp4
+honghu-video/out/honghu_yuanzheng.mp4
