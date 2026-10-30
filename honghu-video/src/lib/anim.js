@@ -34,9 +34,18 @@ export function peelOut(f, start, dur = 10) {
 }
 
 // Jitter: 每 2 帧随机一次 rotate ±1.5°、translate ±1.5px
+// 稳定版：每 16 帧取一个新的随机姿态，期间平滑过渡（仍按两帧取整），幅度为原来的 40%
+const JIT_PERIOD = 16, JIT_SCALE = 0.4;
+function jitKey(id, k) {
+  const r = rand(hash(id) + k * 7919);
+  return [r() * 2 - 1, r() * 2 - 1, r() * 2 - 1];
+}
 export function jitter(id, f, amp = 1) {
-  const r = rand(hash(id) + Math.floor(f / 2) * 7919);
-  return { dx: (r() * 2 - 1) * 1.5 * amp, dy: (r() * 2 - 1) * 1.5 * amp, rot: ((r() * 2 - 1) * 1.5 * amp * Math.PI) / 180 };
+  const t = two(f) / JIT_PERIOD, k = Math.floor(t), u = t - k, s = u * u * (3 - 2 * u);
+  const a = jitKey(id, k), b = jitKey(id, k + 1);
+  const m = 1.5 * amp * JIT_SCALE;
+  const v = a.map((p, i) => p + (b[i] - p) * s);
+  return { dx: v[0] * m, dy: v[1] * m, rot: (v[2] * m * Math.PI) / 180 };
 }
 
 // stamp: scale 1.4→1 in 6 frames
